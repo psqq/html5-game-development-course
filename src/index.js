@@ -4,29 +4,26 @@ import {
     context as ctx,
     makeAlwaysCanvasFullscreen
 } from './canvas';
-import {
-    robowalkImages, images, loadAllImages
-} from './images';
+import { loadAllImages } from './images';
+import Animation from './animation';
 
-var frameRate = 1000 / 30;
-var frameTime = 0;
-var frame = 0;
 var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
-var gritsEffectsTexturePack = new TexturepackerParser();
+
 var spriteSheets = {};
 
+var robowalkAnimation = new Animation({
+    images: Array(19).fill("robowalk/robowalk")
+        .map((x, i) => x + ("" + i).padStart(2, '0') + '.png')
+});
+
 function update() {
-    frameTime += dt;
-    if (frameTime > frameRate) {
-        frame = (frame + 1) % robowalkImages.length;
-        frameTime = 0;
-    }
+    robowalkAnimation.update(dt);
 }
 
 function draw() {
     ctx.clearRect(0, 0, can.width, can.height);
-    ctx.drawImage(robowalkImages[frame], 50, 50);
-    drawSprite('walk_down_0000.png', 200, 50);
+    robowalkAnimation.draw(50, 50);
+    drawSprite('walk_down_0000.png', 200, 100);
 }
 
 function drawSprite(spriteName, posX, posY) {

@@ -86,6 +86,44 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/animation.js":
+/*!**************************!*\
+  !*** ./src/animation.js ***!
+  \**************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Animation; });
+/* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
+/* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./images */ "./src/images.js");
+
+
+
+
+class Animation {
+    constructor(options) {
+        this.images = options.images || [];
+        this.frameRate = options.frameRate || 1000 / 30;
+        this.frameTime = 0;
+        this.frame = 0;
+    }
+    update(dt) {
+        this.frameTime += dt;
+        if (this.frameTime > this.frameRate) {
+            this.frame = (this.frame + 1) % this.images.length;
+            this.frameTime = 0;
+        }
+    }
+    draw(x, y) {
+        _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].drawImage(_images__WEBPACK_IMPORTED_MODULE_1__["images"][this.images[this.frame]], x, y);
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/canvas.js":
 /*!***********************!*\
   !*** ./src/canvas.js ***!
@@ -201,29 +239,29 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./texturepacker-parser */ "./src/texturepacker-parser.js");
 /* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
 /* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./images */ "./src/images.js");
+/* harmony import */ var _animation__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./animation */ "./src/animation.js");
 
 
 
 
-var frameRate = 1000 / 30;
-var frameTime = 0;
-var frame = 0;
+
 var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
-var gritsEffectsTexturePack = new _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__["default"]();
+
 var spriteSheets = {};
 
+var robowalkAnimation = new _animation__WEBPACK_IMPORTED_MODULE_3__["default"]({
+    images: Array(19).fill("robowalk/robowalk")
+        .map((x, i) => x + ("" + i).padStart(2, '0') + '.png')
+});
+
 function update() {
-    frameTime += dt;
-    if (frameTime > frameRate) {
-        frame = (frame + 1) % _images__WEBPACK_IMPORTED_MODULE_2__["robowalkImages"].length;
-        frameTime = 0;
-    }
+    robowalkAnimation.update(dt);
 }
 
 function draw() {
     _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].clearRect(0, 0, _canvas__WEBPACK_IMPORTED_MODULE_1__["canvas"].width, _canvas__WEBPACK_IMPORTED_MODULE_1__["canvas"].height);
-    _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].drawImage(_images__WEBPACK_IMPORTED_MODULE_2__["robowalkImages"][frame], 50, 50);
-    drawSprite('walk_down_0000.png', 200, 50);
+    robowalkAnimation.draw(50, 50);
+    drawSprite('walk_down_0000.png', 200, 100);
 }
 
 function drawSprite(spriteName, posX, posY) {
