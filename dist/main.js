@@ -404,11 +404,24 @@ __webpack_require__.r(__webpack_exports__);
 class TiledMap {
     constructor(filename) {
         this.filename = filename;
+        this.numXTiles = 0;
+        this.numYTiles = 0;
+        this.tileSize = { x: 0, y: 0 };
+        this.pixelSize = { x: 0, y: 0 };
     }
     async loadAndParse() {
         var res = await fetch(this.filename);
         var json = await res.json();
         this.mapJSON = json;
+        this.numXTiles = json.width;
+        this.numYTiles = json.height;
+        this.tileSize = {
+            x: json.tilewidth, y: json.tileheight
+        };
+        this.pixelSize = {
+            x: this.numXTiles * this.tileSize.x,
+            y: this.numYTiles * this.tileSize.y
+        };
     }
 }
 
