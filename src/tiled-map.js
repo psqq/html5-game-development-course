@@ -8,6 +8,7 @@ export default class TiledMap {
         this.numYTiles = 0;
         this.tileSize = { x: 0, y: 0 };
         this.pixelSize = { x: 0, y: 0 };
+        this.tileSets = [];
     }
     async loadAndParse() {
         var res = await fetch(this.filename);
@@ -26,6 +27,15 @@ export default class TiledMap {
             var curDir = path.dirname(this.filename);
             var fn = path.join(curDir, tileset.image);
             var img = await loadImage(fn);
+            this.tileSets.push({
+                image: img,
+                firstgid: tileset.firstgid,
+                imageheight: tileset.imageheight,
+                imagewidth: tileset.imagewidth,
+                name: tileset.name,
+                numXTiles: Math.floor(tileset.imagewidth / this.tileSize.x),
+                numYTiles: Math.floor(tileset.imageheight / this.tileSize.y)
+            });
         }
     }
 }

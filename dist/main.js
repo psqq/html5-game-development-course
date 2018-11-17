@@ -1150,6 +1150,7 @@ class TiledMap {
         this.numYTiles = 0;
         this.tileSize = { x: 0, y: 0 };
         this.pixelSize = { x: 0, y: 0 };
+        this.tileSets = [];
     }
     async loadAndParse() {
         var res = await fetch(this.filename);
@@ -1168,6 +1169,15 @@ class TiledMap {
             var curDir = path_browserify__WEBPACK_IMPORTED_MODULE_0___default.a.dirname(this.filename);
             var fn = path_browserify__WEBPACK_IMPORTED_MODULE_0___default.a.join(curDir, tileset.image);
             var img = await Object(_images__WEBPACK_IMPORTED_MODULE_1__["loadImage"])(fn);
+            this.tileSets.push({
+                image: img,
+                firstgid: tileset.firstgid,
+                imageheight: tileset.imageheight,
+                imagewidth: tileset.imagewidth,
+                name: tileset.name,
+                numXTiles: Math.floor(tileset.imagewidth / this.tileSize.x),
+                numYTiles: Math.floor(tileset.imageheight / this.tileSize.y)
+            });
         }
     }
 }
