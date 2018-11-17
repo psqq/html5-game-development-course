@@ -1493,7 +1493,7 @@
 	"tileheight": 64,
 	"tilesets": [{
 		"firstgid": 1,
-		"image": "./assets/images/grits_master.png",
+		"image": "../images/grits_master.png",
 		"imageheight": 2048,
 		"imagewidth": 2048,
 		"margin": 0,
