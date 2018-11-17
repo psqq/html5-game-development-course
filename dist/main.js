@@ -120,6 +120,7 @@ async function main() {
     makeAlwaysCanvasFullscreen();
     var img = await loadImage('./img/ralphyrobot.png');
     console.log('Image loaded!');
+    ctx.drawImage(img, 50, 50);
 }
 
 main();
