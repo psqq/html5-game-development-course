@@ -240,6 +240,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
 /* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./images */ "./src/images.js");
 /* harmony import */ var _animation__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./animation */ "./src/animation.js");
+/* harmony import */ var _tiled_map__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tiled-map */ "./src/tiled-map.js");
+
 
 
 
@@ -253,6 +255,8 @@ var robowalkAnimation = new _animation__WEBPACK_IMPORTED_MODULE_3__["default"]({
     images: Array(19).fill("robowalk/robowalk")
         .map((x, i) => x + ("" + i).padStart(2, '0') + '.png')
 });
+
+var map = new _tiled_map__WEBPACK_IMPORTED_MODULE_4__["default"]('./assets/json/map.json');
 
 function update() {
     robowalkAnimation.update(dt);
@@ -296,6 +300,9 @@ async function main() {
     console.log(spriteSheets['grits_effects']);
     console.log(spriteSheets['grits_effects'].sprites);
     console.log(spriteSheets['grits_effects'].sprites[123]);
+
+    await map.loadAndParse();
+    console.log('map', map);
 
     // mainloop
     function go() {
@@ -377,6 +384,31 @@ class TexturepackerParser {
                 cx, cy
             );
         }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/tiled-map.js":
+/*!**************************!*\
+  !*** ./src/tiled-map.js ***!
+  \**************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return TiledMap; });
+
+class TiledMap {
+    constructor(filename) {
+        this.filename = filename;
+    }
+    async loadAndParse() {
+        var res = await fetch(this.filename);
+        var json = await res.json();
+        this.mapJSON = json;
     }
 }
 

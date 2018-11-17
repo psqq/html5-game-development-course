@@ -6,6 +6,7 @@ import {
 } from './canvas';
 import { loadAllImages } from './images';
 import Animation from './animation';
+import TiledMap from './tiled-map';
 
 var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
 
@@ -15,6 +16,8 @@ var robowalkAnimation = new Animation({
     images: Array(19).fill("robowalk/robowalk")
         .map((x, i) => x + ("" + i).padStart(2, '0') + '.png')
 });
+
+var map = new TiledMap('./assets/json/map.json');
 
 function update() {
     robowalkAnimation.update(dt);
@@ -58,6 +61,9 @@ async function main() {
     console.log(spriteSheets['grits_effects']);
     console.log(spriteSheets['grits_effects'].sprites);
     console.log(spriteSheets['grits_effects'].sprites[123]);
+
+    await map.loadAndParse();
+    console.log('map', map);
 
     // mainloop
     function go() {
