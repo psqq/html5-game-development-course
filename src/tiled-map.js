@@ -64,8 +64,8 @@ export default class TiledMap {
                         continue;
                     }
                     var pkt = this.getTilePacket(idx);
-                    var x = this.tileSize.x * Math.floor(i / this.numXTiles);
-                    var y = this.tileSize.y * (i % this.numXTiles);
+                    var x = this.tileSize.y * (i % this.numXTiles);
+                    var y = this.tileSize.x * Math.floor(i / this.numXTiles);
                     ctx.drawImage(
                         pkt.img,
                         pkt.px, pkt.py,
