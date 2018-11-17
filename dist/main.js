@@ -1040,6 +1040,7 @@ async function main() {
 
     await map.loadAndParse();
     console.log('map', map);
+    console.log(map.getTilePacket(1));
 
     // mainloop
     function go() {
@@ -1165,7 +1166,7 @@ class TiledMap {
             x: this.numXTiles * this.tileSize.x,
             y: this.numYTiles * this.tileSize.y
         };
-        for(var tileset of json.tilesets) {
+        for (var tileset of json.tilesets) {
             var curDir = path_browserify__WEBPACK_IMPORTED_MODULE_0___default.a.dirname(this.filename);
             var fn = path_browserify__WEBPACK_IMPORTED_MODULE_0___default.a.join(curDir, tileset.image);
             var img = await Object(_images__WEBPACK_IMPORTED_MODULE_1__["loadImage"])(fn);
@@ -1179,6 +1180,22 @@ class TiledMap {
                 numYTiles: Math.floor(tileset.imageheight / this.tileSize.y)
             });
         }
+    }
+    getTilePacket(tileIndex) {
+        var pkt = {
+            img: null, px: 0, py: 0
+        };
+        for (var i = this.tileSets.length - 1; i >= 0; i--) {
+            var tileset = this.tileSets[i];
+            if (tileset.firstgid <= tileIndex) {
+                pkt.img = tileset.image;
+                var localIdx = tileIndex - tileset.firstgid;
+                pkt.py = this.tileSize.y * Math.floor(localIdx / tileset.numXTiles);
+                pkt.px = this.tileSize.x * (localIdx % tileset.numXTiles);
+                break;
+            }
+        }
+        return pkt;
     }
 }
 

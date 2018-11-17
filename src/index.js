@@ -64,6 +64,7 @@ async function main() {
 
     await map.loadAndParse();
     console.log('map', map);
+    console.log(map.getTilePacket(1));
 
     // mainloop
     function go() {
