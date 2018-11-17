@@ -1,69 +1,66 @@
 import TexturepackerParser from './texturepacker-parser';
+import {
+    canvas as can,
+    context as ctx,
+    makeAlwaysCanvasFullscreen
+} from './canvas';
+import {
+    robowalkImages, images, loadAllImages
+} from './images';
 
-var can = document.querySelector('canvas');
-var ctx = can.getContext('2d');
-var where = './assets/images/robowalk/';
-var assets = [
-    'robowalk00.png', 'robowalk01.png', 'robowalk02.png',
-    'robowalk03.png', 'robowalk04.png', 'robowalk05.png',
-    'robowalk06.png', 'robowalk07.png', 'robowalk08.png',
-    'robowalk09.png', 'robowalk10.png', 'robowalk11.png',
-    'robowalk12.png', 'robowalk13.png', 'robowalk14.png',
-    'robowalk15.png', 'robowalk16.png', 'robowalk17.png',
-    'robowalk18.png'
-];
-var images = [];
 var frameRate = 1000 / 30;
 var frameTime = 0;
 var frame = 0;
 var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
 var gritsEffectsTexturePack = new TexturepackerParser();
-
-function setFullscreenSizeForCanvas() {
-    can.width = window.innerWidth;
-    can.height = window.innerHeight;
-}
-
-function makeAlwaysCanvasFullscreen() {
-    setFullscreenSizeForCanvas();
-    window.addEventListener('resize', setFullscreenSizeForCanvas);
-}
-
-function loadImage(filename) {
-    return new Promise((resolve, reject) => {
-        let img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = err => reject(err);
-        img.src = filename;
-    });
-}
+var spriteSheets = {};
 
 function update() {
     frameTime += dt;
     if (frameTime > frameRate) {
-        frame = (frame + 1) % images.length;
+        frame = (frame + 1) % robowalkImages.length;
         frameTime = 0;
     }
 }
 
 function draw() {
     ctx.clearRect(0, 0, can.width, can.height);
-    ctx.drawImage(images[frame], 50, 50);
+    ctx.drawImage(robowalkImages[frame], 50, 50);
+    drawSprite('walk_down_0000.png', 200, 50);
+}
+
+function drawSprite(spriteName, posX, posY) {
+    for (var sheetName in spriteSheets) {
+        var sheet = spriteSheets[sheetName];
+        var sprite = sheet.getStats(spriteName);
+        if (sprite == null) continue;
+        __drawSpriteInternal(sprite, sheet, posX, posY);
+    }
+}
+
+function __drawSpriteInternal(spt, sheet, posX, posY) {
+    if (spt == null || sheet == null) return;
+    var hlf = {
+        x: spt.cx, y: spt.cy
+    };
+    ctx.drawImage(
+        sheet.img,
+        spt.x, spt.y, spt.w, spt.h,
+        posX + hlf.x, posY + hlf.y, spt.w, spt.h
+    );
 }
 
 async function main() {
     makeAlwaysCanvasFullscreen();
+    await loadAllImages();
 
-    var promises = [];
-    for(var filename of assets) {
-        promises.push(loadImage(where + filename));
-    }
-    images = await Promise.all(promises);
+    spriteSheets['grits_effects'] = new TexturepackerParser('./assets/json/grits_effects.json');
+    await spriteSheets['grits_effects'].loadAndParse();
 
-    await gritsEffectsTexturePack.loadAndParse("./assets/json/grits_effects.json");
     console.log('./assets/json/grits_effects.json parsed:');
-    console.log(gritsEffectsTexturePack.sprites);
-    console.log(gritsEffectsTexturePack.sprites[123]);
+    console.log(spriteSheets['grits_effects']);
+    console.log(spriteSheets['grits_effects'].sprites);
+    console.log(spriteSheets['grits_effects'].sprites[123]);
 
     // mainloop
     function go() {

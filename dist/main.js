@@ -86,46 +86,78 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/index.js":
-/*!**********************!*\
-  !*** ./src/index.js ***!
-  \**********************/
-/*! no exports provided */
+/***/ "./src/canvas.js":
+/*!***********************!*\
+  !*** ./src/canvas.js ***!
+  \***********************/
+/*! exports provided: canvas, context, setFullscreenSizeForCanvas, makeAlwaysCanvasFullscreen */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./texturepacker-parser */ "./src/texturepacker-parser.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "canvas", function() { return canvas; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "context", function() { return context; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setFullscreenSizeForCanvas", function() { return setFullscreenSizeForCanvas; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "makeAlwaysCanvasFullscreen", function() { return makeAlwaysCanvasFullscreen; });
 
-
-var can = document.querySelector('canvas');
-var ctx = can.getContext('2d');
-var where = './assets/images/robowalk/';
-var assets = [
-    'robowalk00.png', 'robowalk01.png', 'robowalk02.png',
-    'robowalk03.png', 'robowalk04.png', 'robowalk05.png',
-    'robowalk06.png', 'robowalk07.png', 'robowalk08.png',
-    'robowalk09.png', 'robowalk10.png', 'robowalk11.png',
-    'robowalk12.png', 'robowalk13.png', 'robowalk14.png',
-    'robowalk15.png', 'robowalk16.png', 'robowalk17.png',
-    'robowalk18.png'
-];
-var images = [];
-var frameRate = 1000 / 30;
-var frameTime = 0;
-var frame = 0;
-var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
-var gritsEffectsTexturePack = new _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__["default"]();
+const canvas = document.querySelector('canvas');
+const context = canvas.getContext('2d');
 
 function setFullscreenSizeForCanvas() {
-    can.width = window.innerWidth;
-    can.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
 
 function makeAlwaysCanvasFullscreen() {
     setFullscreenSizeForCanvas();
     window.addEventListener('resize', setFullscreenSizeForCanvas);
 }
+
+
+/***/ }),
+
+/***/ "./src/images.js":
+/*!***********************!*\
+  !*** ./src/images.js ***!
+  \***********************/
+/*! exports provided: robowalkImages, images, loadImage, loadAllImages */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "robowalkImages", function() { return robowalkImages; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "images", function() { return images; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadImage", function() { return loadImage; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadAllImages", function() { return loadAllImages; });
+
+var robowalkWhere = './assets/images/robowalk/';
+var robowalkAssets = [
+    'robowalk00.png', 'robowalk01.png', 'robowalk02.png',
+    'robowalk03.png', 'robowalk04.png', 'robowalk05.png',
+    'robowalk06.png', 'robowalk07.png', 'robowalk08.png',
+    'robowalk09.png', 'robowalk10.png', 'robowalk11.png',
+    'robowalk12.png', 'robowalk13.png', 'robowalk14.png',
+    'robowalk15.png', 'robowalk16.png', 'robowalk17.png',
+    'robowalk18.png',
+];
+
+var imagesWhere = './assets/images/';
+var imagesAssets = [
+    "robowalk/robowalk00.png", "robowalk/robowalk01.png", "robowalk/robowalk02.png",
+    "robowalk/robowalk03.png", "robowalk/robowalk04.png", "robowalk/robowalk05.png",
+    "robowalk/robowalk06.png", "robowalk/robowalk07.png", "robowalk/robowalk08.png",
+    "robowalk/robowalk09.png", "robowalk/robowalk10.png", "robowalk/robowalk11.png",
+    "robowalk/robowalk12.png", "robowalk/robowalk13.png", "robowalk/robowalk14.png",
+    "robowalk/robowalk15.png", "robowalk/robowalk16.png", "robowalk/robowalk17.png",
+    "robowalk/robowalk18.png",
+    'grits_effects.png',
+    'grits_master.png',
+    'ralphyrobot.png',
+];
+
+var robowalkImages = [];
+
+var images = {};
 
 function loadImage(filename) {
     return new Promise((resolve, reject) => {
@@ -136,32 +168,96 @@ function loadImage(filename) {
     });
 }
 
+async function loadAllImages() {
+    // Load robowalk images
+    var promises = [];
+    for (var filename of robowalkAssets) {
+        promises.push(loadImage(robowalkWhere + filename));
+    }
+    robowalkImages = await Promise.all(promises);
+    // Load other images
+    promises = [];
+    for (var filename of imagesAssets) {
+        promises.push(loadImage(imagesWhere + filename));
+    }
+    var imagesArr = await Promise.all(promises);
+    for (var i = 0; i < imagesAssets.length; i++) {
+        images[imagesAssets[i]] = imagesArr[i];
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/index.js":
+/*!**********************!*\
+  !*** ./src/index.js ***!
+  \**********************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./texturepacker-parser */ "./src/texturepacker-parser.js");
+/* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
+/* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./images */ "./src/images.js");
+
+
+
+
+var frameRate = 1000 / 30;
+var frameTime = 0;
+var frame = 0;
+var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
+var gritsEffectsTexturePack = new _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__["default"]();
+var spriteSheets = {};
+
 function update() {
     frameTime += dt;
     if (frameTime > frameRate) {
-        frame = (frame + 1) % images.length;
+        frame = (frame + 1) % _images__WEBPACK_IMPORTED_MODULE_2__["robowalkImages"].length;
         frameTime = 0;
     }
 }
 
 function draw() {
-    ctx.clearRect(0, 0, can.width, can.height);
-    ctx.drawImage(images[frame], 50, 50);
+    _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].clearRect(0, 0, _canvas__WEBPACK_IMPORTED_MODULE_1__["canvas"].width, _canvas__WEBPACK_IMPORTED_MODULE_1__["canvas"].height);
+    _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].drawImage(_images__WEBPACK_IMPORTED_MODULE_2__["robowalkImages"][frame], 50, 50);
+    drawSprite('walk_down_0000.png', 200, 50);
+}
+
+function drawSprite(spriteName, posX, posY) {
+    for (var sheetName in spriteSheets) {
+        var sheet = spriteSheets[sheetName];
+        var sprite = sheet.getStats(spriteName);
+        if (sprite == null) continue;
+        __drawSpriteInternal(sprite, sheet, posX, posY);
+    }
+}
+
+function __drawSpriteInternal(spt, sheet, posX, posY) {
+    if (spt == null || sheet == null) return;
+    var hlf = {
+        x: spt.cx, y: spt.cy
+    };
+    _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].drawImage(
+        sheet.img,
+        spt.x, spt.y, spt.w, spt.h,
+        posX + hlf.x, posY + hlf.y, spt.w, spt.h
+    );
 }
 
 async function main() {
-    makeAlwaysCanvasFullscreen();
+    Object(_canvas__WEBPACK_IMPORTED_MODULE_1__["makeAlwaysCanvasFullscreen"])();
+    await Object(_images__WEBPACK_IMPORTED_MODULE_2__["loadAllImages"])();
 
-    var promises = [];
-    for(var filename of assets) {
-        promises.push(loadImage(where + filename));
-    }
-    images = await Promise.all(promises);
+    spriteSheets['grits_effects'] = new _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__["default"]('./assets/json/grits_effects.json');
+    await spriteSheets['grits_effects'].loadAndParse();
 
-    await gritsEffectsTexturePack.loadAndParse("./assets/json/grits_effects.json");
     console.log('./assets/json/grits_effects.json parsed:');
-    console.log(gritsEffectsTexturePack.sprites);
-    console.log(gritsEffectsTexturePack.sprites[123]);
+    console.log(spriteSheets['grits_effects']);
+    console.log(spriteSheets['grits_effects'].sprites);
+    console.log(spriteSheets['grits_effects'].sprites[123]);
 
     // mainloop
     function go() {
@@ -191,14 +287,31 @@ main();
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return TexturepackerParser; });
+/* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./images */ "./src/images.js");
+
 
 class TexturepackerParser {
-    constructor() {
+    constructor(filename) {
+        this.filename = filename;
         this.sprites = [];
+        this.atlasJSON = null;
+        this.img = null;
+    }
+    getStats(name) {
+        for(var sprite of this.sprites) {
+            if (sprite.id == name) {
+                return sprite;
+            }
+        }
+        return null;
     }
     async loadAndParse(filename) {
-        var res = await fetch(filename);
-        this.parseAtlasDefinition(await res.json());
+        if (filename) {
+            this.filename = filename;
+        }
+        var res = await fetch(this.filename);
+        this.atlasJSON = await res.json();
+        this.parseAtlasDefinition();
     }
     defSprite(name, x, y, w, h, cx, cy) {
         var spt = {
@@ -209,9 +322,10 @@ class TexturepackerParser {
         };
         this.sprites.push(spt);
     }
-    parseAtlasDefinition(atlasJSON) {
-        for (var name in atlasJSON.frames) {
-            var sprite = atlasJSON.frames[name];
+    parseAtlasDefinition() {
+        this.img = _images__WEBPACK_IMPORTED_MODULE_0__["images"][this.atlasJSON.meta.image];
+        for (var name in this.atlasJSON.frames) {
+            var sprite = this.atlasJSON.frames[name];
             var cx = -sprite.frame.w / 2;
             var cy = -sprite.frame.h / 2;
             this.defSprite(
