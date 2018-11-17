@@ -38,6 +38,10 @@ export default class TexturepackerParser {
             var sprite = this.atlasJSON.frames[name];
             var cx = -sprite.frame.w / 2;
             var cy = -sprite.frame.h / 2;
+            if (sprite.trimmed) {
+                cx = sprite.spriteSourceSize.x - (sprite.sourceSize.w / 2);
+                cy = sprite.spriteSourceSize.y - (sprite.sourceSize.h / 2);
+            }
             this.defSprite(
                 name,
                 sprite.frame.x, sprite.frame.y,
