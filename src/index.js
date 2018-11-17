@@ -7,8 +7,12 @@ import {
 import { loadAllImages } from './images';
 import Animation from './animation';
 import TiledMap from './tiled-map';
+import key from 'keymaster';
+import Victor from 'victor';
 
 var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
+
+var cam = { x: 0, y: 0, scale: 1, speed: 1 };
 
 var spriteSheets = {};
 
@@ -21,12 +25,30 @@ var map = new TiledMap('./assets/json/map.json');
 
 function update() {
     robowalkAnimation.update(dt);
+    var dir = new Victor(0, 0);
+    if (key.isPressed('left')) dir.x -= 1;
+    if (key.isPressed('right')) dir.x += 1;
+    if (key.isPressed('up')) dir.y -= 1;
+    if (key.isPressed('down')) dir.y += 1;
+    if (dir.length() > 0) {
+        dir = dir.norm().multiplyScalar(cam.speed * dt);
+        cam.x += dir.x;
+        cam.y += dir.y;
+    }
 }
+
+key('z', () => cam.scale = Math.max(0, cam.scale - 0.1));
+key('x', () => cam.scale += 0.1);
 
 function draw() {
     ctx.clearRect(0, 0, can.width, can.height);
+    ctx.save();
+    ctx.translate(-cam.x, -cam.y);
+    ctx.scale(cam.scale, cam.scale);
+    map.draw();
     robowalkAnimation.draw(50, 50);
     drawSprite('walk_down_0000.png', 200, 100);
+    ctx.restore();
 }
 
 function drawSprite(spriteName, posX, posY) {

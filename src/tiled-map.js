@@ -1,5 +1,6 @@
 import path from 'path-browserify';
 import { loadImage } from './images';
+import { context as ctx } from './canvas';
 
 export default class TiledMap {
     constructor(filename) {
@@ -53,5 +54,27 @@ export default class TiledMap {
             }
         }
         return pkt;
+    }
+    draw() {
+        for (var layer of this.mapJSON.layers) {
+            if (layer.type === 'tilelayer') {
+                for (var i = 0; i < layer.data.length; i++) {
+                    var idx = layer.data[i];
+                    if (idx <= 0) {
+                        continue;
+                    }
+                    var pkt = this.getTilePacket(idx);
+                    var x = this.tileSize.x * Math.floor(i / this.numXTiles);
+                    var y = this.tileSize.y * (i % this.numXTiles);
+                    ctx.drawImage(
+                        pkt.img,
+                        pkt.px, pkt.py,
+                        this.tileSize.x, this.tileSize.y,
+                        x, y,
+                        this.tileSize.x, this.tileSize.y
+                    );
+                }
+            }
+        }
     }
 }
