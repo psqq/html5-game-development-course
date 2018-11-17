@@ -107,7 +107,22 @@ function makeAlwaysCanvasFullscreen() {
     window.addEventListener('resize', setFullscreenSizeForCanvas);
 }
 
-makeAlwaysCanvasFullscreen();
+function loadImage(filename) {
+    return new Promise((resolve, reject) => {
+        let img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = err => reject(err);
+        img.src = filename;
+    });
+}
+
+async function main() {
+    makeAlwaysCanvasFullscreen();
+    var img = await loadImage('./img/ralphyrobot.png');
+    console.log('Image loaded!');
+}
+
+main();
 
 
 /***/ })
