@@ -90,8 +90,12 @@
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./texturepacker-parser */ "./src/texturepacker-parser.js");
 
 
 var can = document.querySelector('canvas');
@@ -111,6 +115,7 @@ var frameRate = 1000 / 30;
 var frameTime = 0;
 var frame = 0;
 var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
+var gritsEffectsTexturePack = new _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__["default"]();
 
 function setFullscreenSizeForCanvas() {
     can.width = window.innerWidth;
@@ -146,11 +151,18 @@ function draw() {
 
 async function main() {
     makeAlwaysCanvasFullscreen();
+
     var promises = [];
     for(var filename of assets) {
         promises.push(loadImage(where + filename));
     }
     images = await Promise.all(promises);
+
+    await gritsEffectsTexturePack.loadAndParse("./assets/json/grits_effects.json");
+    console.log('./assets/json/grits_effects.json parsed:');
+    console.log(gritsEffectsTexturePack.sprites);
+    console.log(gritsEffectsTexturePack.sprites[123]);
+
     // mainloop
     function go() {
         timestamp = performance.now();
@@ -165,6 +177,52 @@ async function main() {
 }
 
 main();
+
+
+/***/ }),
+
+/***/ "./src/texturepacker-parser.js":
+/*!*************************************!*\
+  !*** ./src/texturepacker-parser.js ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return TexturepackerParser; });
+
+class TexturepackerParser {
+    constructor() {
+        this.sprites = [];
+    }
+    async loadAndParse(filename) {
+        var res = await fetch(filename);
+        this.parseAtlasDefinition(await res.json());
+    }
+    defSprite(name, x, y, w, h, cx, cy) {
+        var spt = {
+            id: name,
+            x, y, w, h,
+            cx: cx == null ? 0 : cx,
+            cy: cy == null ? 0 : cy
+        };
+        this.sprites.push(spt);
+    }
+    parseAtlasDefinition(atlasJSON) {
+        for (var name in atlasJSON.frames) {
+            var sprite = atlasJSON.frames[name];
+            var cx = -sprite.frame.w / 2;
+            var cy = -sprite.frame.h / 2;
+            this.defSprite(
+                name,
+                sprite.frame.x, sprite.frame.y,
+                sprite.frame.w, sprite.frame.h,
+                cx, cy
+            );
+        }
+    }
+}
 
 
 /***/ })

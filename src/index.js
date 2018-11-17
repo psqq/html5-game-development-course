@@ -1,3 +1,4 @@
+import TexturepackerParser from './texturepacker-parser';
 
 var can = document.querySelector('canvas');
 var ctx = can.getContext('2d');
@@ -16,6 +17,7 @@ var frameRate = 1000 / 30;
 var frameTime = 0;
 var frame = 0;
 var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
+var gritsEffectsTexturePack = new TexturepackerParser();
 
 function setFullscreenSizeForCanvas() {
     can.width = window.innerWidth;
@@ -51,11 +53,18 @@ function draw() {
 
 async function main() {
     makeAlwaysCanvasFullscreen();
+
     var promises = [];
     for(var filename of assets) {
         promises.push(loadImage(where + filename));
     }
     images = await Promise.all(promises);
+
+    await gritsEffectsTexturePack.loadAndParse("./assets/json/grits_effects.json");
+    console.log('./assets/json/grits_effects.json parsed:');
+    console.log(gritsEffectsTexturePack.sprites);
+    console.log(gritsEffectsTexturePack.sprites[123]);
+
     // mainloop
     function go() {
         timestamp = performance.now();
