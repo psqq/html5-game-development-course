@@ -9,6 +9,7 @@ import Animation from './animation';
 import TiledMap from './tiled-map';
 import key from 'keymaster';
 import Victor from 'victor';
+import * as viewRect from './view-rect';
 
 var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
 
@@ -32,23 +33,21 @@ function update() {
     if (key.isPressed('down')) dir.y += 1;
     if (dir.length() > 0) {
         dir = dir.norm().multiplyScalar(cam.speed * dt);
-        cam.x += dir.x;
-        cam.y += dir.y;
+        viewRect.moveTo(viewRect.x + dir.x, viewRect.y + dir.y);
     }
+    viewRect.updateSize();
 }
 
-key('z', () => cam.scale = Math.max(0, cam.scale - 0.1));
-key('x', () => cam.scale += 0.1);
+key('z', () => viewRect.scale = Math.max(0, viewRect.scale - 0.1));
+key('x', () => viewRect.scale += 0.1);
 
 function draw() {
     ctx.clearRect(0, 0, can.width, can.height);
-    ctx.save();
-    ctx.translate(-cam.x, -cam.y);
-    ctx.scale(cam.scale, cam.scale);
+    viewRect.begin();
     map.draw();
     robowalkAnimation.draw(50, 50);
     drawSprite('walk_down_0000.png', 200, 100);
-    ctx.restore();
+    viewRect.end();
 }
 
 function drawSprite(spriteName, posX, posY) {
@@ -76,17 +75,15 @@ async function main() {
     makeAlwaysCanvasFullscreen();
     await loadAllImages();
 
-    spriteSheets['grits_effects'] = new TexturepackerParser('./assets/json/grits_effects.json');
-    await spriteSheets['grits_effects'].loadAndParse();
+    var sheet1 = new TexturepackerParser('./assets/json/grits_effects.json');
+    await sheet1.loadAndParse();
+    spriteSheets['grits_effects'] = sheet1;
 
     console.log('./assets/json/grits_effects.json parsed:');
-    console.log(spriteSheets['grits_effects']);
-    console.log(spriteSheets['grits_effects'].sprites);
-    console.log(spriteSheets['grits_effects'].sprites[123]);
 
     await map.loadAndParse();
-    console.log('map', map);
-    console.log(map.getTilePacket(1));
+
+    viewRect.updateSize();
 
     // mainloop
     function go() {

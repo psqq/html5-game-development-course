@@ -2624,6 +2624,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var keymaster__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(keymaster__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! victor */ "./node_modules/victor/index.js");
 /* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(victor__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _view_rect__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./view-rect */ "./src/view-rect.js");
+
 
 
 
@@ -2654,23 +2656,21 @@ function update() {
     if (keymaster__WEBPACK_IMPORTED_MODULE_5___default.a.isPressed('down')) dir.y += 1;
     if (dir.length() > 0) {
         dir = dir.norm().multiplyScalar(cam.speed * dt);
-        cam.x += dir.x;
-        cam.y += dir.y;
+        _view_rect__WEBPACK_IMPORTED_MODULE_7__["moveTo"](_view_rect__WEBPACK_IMPORTED_MODULE_7__["x"] + dir.x, _view_rect__WEBPACK_IMPORTED_MODULE_7__["y"] + dir.y);
     }
+    _view_rect__WEBPACK_IMPORTED_MODULE_7__["updateSize"]();
 }
 
-keymaster__WEBPACK_IMPORTED_MODULE_5___default()('z', () => cam.scale = Math.max(0, cam.scale - 0.1));
-keymaster__WEBPACK_IMPORTED_MODULE_5___default()('x', () => cam.scale += 0.1);
+keymaster__WEBPACK_IMPORTED_MODULE_5___default()('z', () => _view_rect__WEBPACK_IMPORTED_MODULE_7__["scale"] = Math.max(0, _view_rect__WEBPACK_IMPORTED_MODULE_7__["scale"] - 0.1));
+keymaster__WEBPACK_IMPORTED_MODULE_5___default()('x', () => _view_rect__WEBPACK_IMPORTED_MODULE_7__["scale"] += 0.1);
 
 function draw() {
     _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].clearRect(0, 0, _canvas__WEBPACK_IMPORTED_MODULE_1__["canvas"].width, _canvas__WEBPACK_IMPORTED_MODULE_1__["canvas"].height);
-    _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].save();
-    _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].translate(-cam.x, -cam.y);
-    _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].scale(cam.scale, cam.scale);
+    _view_rect__WEBPACK_IMPORTED_MODULE_7__["begin"]();
     map.draw();
     robowalkAnimation.draw(50, 50);
     drawSprite('walk_down_0000.png', 200, 100);
-    _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].restore();
+    _view_rect__WEBPACK_IMPORTED_MODULE_7__["end"]();
 }
 
 function drawSprite(spriteName, posX, posY) {
@@ -2698,17 +2698,15 @@ async function main() {
     Object(_canvas__WEBPACK_IMPORTED_MODULE_1__["makeAlwaysCanvasFullscreen"])();
     await Object(_images__WEBPACK_IMPORTED_MODULE_2__["loadAllImages"])();
 
-    spriteSheets['grits_effects'] = new _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__["default"]('./assets/json/grits_effects.json');
-    await spriteSheets['grits_effects'].loadAndParse();
+    var sheet1 = new _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__["default"]('./assets/json/grits_effects.json');
+    await sheet1.loadAndParse();
+    spriteSheets['grits_effects'] = sheet1;
 
     console.log('./assets/json/grits_effects.json parsed:');
-    console.log(spriteSheets['grits_effects']);
-    console.log(spriteSheets['grits_effects'].sprites);
-    console.log(spriteSheets['grits_effects'].sprites[123]);
 
     await map.loadAndParse();
-    console.log('map', map);
-    console.log(map.getTilePacket(1));
+
+    _view_rect__WEBPACK_IMPORTED_MODULE_7__["updateSize"]();
 
     // mainloop
     function go() {
@@ -2889,6 +2887,58 @@ class TiledMap {
             }
         }
     }
+}
+
+
+/***/ }),
+
+/***/ "./src/view-rect.js":
+/*!**************************!*\
+  !*** ./src/view-rect.js ***!
+  \**************************/
+/*! exports provided: x, y, w, h, scale, updateSize, moveTo, centerAt, begin, end */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "x", function() { return x; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "y", function() { return y; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "w", function() { return w; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return h; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "scale", function() { return scale; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateSize", function() { return updateSize; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "moveTo", function() { return moveTo; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "centerAt", function() { return centerAt; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "begin", function() { return begin; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "end", function() { return end; });
+/* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
+
+
+var x = 0, y = 0, w = 0, h = 0, scale = 1;
+
+function updateSize() {
+    w = _canvas__WEBPACK_IMPORTED_MODULE_0__["canvas"].width;
+    h = _canvas__WEBPACK_IMPORTED_MODULE_0__["canvas"].height;
+}
+
+function moveTo(ax, ay) {
+    x = ax;
+    y = ay;
+}
+
+function centerAt(ax, ay) {
+    x = ax - _canvas__WEBPACK_IMPORTED_MODULE_0__["canvas"].width / 2;
+    y = ay - _canvas__WEBPACK_IMPORTED_MODULE_0__["canvas"].height / 2;
+}
+
+function begin() {
+    _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].save();
+    _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].translate(-x, -y);
+    _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].scale(scale, scale);
+}
+
+function end() {
+    _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].restore();
 }
 
 
