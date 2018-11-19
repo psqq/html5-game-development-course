@@ -2485,6 +2485,8 @@ class Animation {
     constructor(options) {
         this.images = options.images || [];
         this.frameRate = options.frameRate || 1000 / 30;
+        this.offsetX = options.offsetX || 0;
+        this.offsetY = options.offsetY || 0;
         this.frameTime = 0;
         this.frame = 0;
     }
@@ -2496,7 +2498,7 @@ class Animation {
         }
     }
     draw(x, y) {
-        _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].drawImage(_images__WEBPACK_IMPORTED_MODULE_1__["images"][this.images[this.frame]], x, y);
+        _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].drawImage(_images__WEBPACK_IMPORTED_MODULE_1__["images"][this.images[this.frame]], this.offsetX + x, this.offsetY + y);
     }
 }
 
@@ -2618,14 +2620,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./texturepacker-parser */ "./src/texturepacker-parser.js");
 /* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
 /* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./images */ "./src/images.js");
-/* harmony import */ var _animation__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./animation */ "./src/animation.js");
-/* harmony import */ var _tiled_map__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tiled-map */ "./src/tiled-map.js");
-/* harmony import */ var keymaster__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! keymaster */ "./node_modules/keymaster/keymaster.js");
-/* harmony import */ var keymaster__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(keymaster__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! victor */ "./node_modules/victor/index.js");
-/* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(victor__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _view_rect__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./view-rect */ "./src/view-rect.js");
-
+/* harmony import */ var _tiled_map__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./tiled-map */ "./src/tiled-map.js");
+/* harmony import */ var keymaster__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! keymaster */ "./node_modules/keymaster/keymaster.js");
+/* harmony import */ var keymaster__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(keymaster__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _view_rect__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./view-rect */ "./src/view-rect.js");
+/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./player */ "./src/player.js");
 
 
 
@@ -2636,41 +2635,28 @@ __webpack_require__.r(__webpack_exports__);
 
 var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
 
-var cam = { x: 0, y: 0, scale: 1, speed: 1 };
-
 var spriteSheets = {};
 
-var robowalkAnimation = new _animation__WEBPACK_IMPORTED_MODULE_3__["default"]({
-    images: Array(19).fill("robowalk/robowalk")
-        .map((x, i) => x + ("" + i).padStart(2, '0') + '.png')
-});
-
-var map = new _tiled_map__WEBPACK_IMPORTED_MODULE_4__["default"]('./assets/json/map.json');
+var map = new _tiled_map__WEBPACK_IMPORTED_MODULE_3__["default"]('./assets/json/map.json');
 
 function update() {
-    robowalkAnimation.update(dt);
-    var dir = new victor__WEBPACK_IMPORTED_MODULE_6___default.a(0, 0);
-    if (keymaster__WEBPACK_IMPORTED_MODULE_5___default.a.isPressed('left')) dir.x -= 1;
-    if (keymaster__WEBPACK_IMPORTED_MODULE_5___default.a.isPressed('right')) dir.x += 1;
-    if (keymaster__WEBPACK_IMPORTED_MODULE_5___default.a.isPressed('up')) dir.y -= 1;
-    if (keymaster__WEBPACK_IMPORTED_MODULE_5___default.a.isPressed('down')) dir.y += 1;
-    if (dir.length() > 0) {
-        dir = dir.norm().multiplyScalar(cam.speed * dt);
-        _view_rect__WEBPACK_IMPORTED_MODULE_7__["moveTo"](_view_rect__WEBPACK_IMPORTED_MODULE_7__["x"] + dir.x, _view_rect__WEBPACK_IMPORTED_MODULE_7__["y"] + dir.y);
-    }
-    _view_rect__WEBPACK_IMPORTED_MODULE_7__["updateSize"]();
+    _player__WEBPACK_IMPORTED_MODULE_6__["update"](dt);
+    _view_rect__WEBPACK_IMPORTED_MODULE_5__["updateSize"]();
 }
 
-keymaster__WEBPACK_IMPORTED_MODULE_5___default()('z', () => _view_rect__WEBPACK_IMPORTED_MODULE_7__["scale"] = Math.max(0, _view_rect__WEBPACK_IMPORTED_MODULE_7__["scale"] - 0.1));
-keymaster__WEBPACK_IMPORTED_MODULE_5___default()('x', () => _view_rect__WEBPACK_IMPORTED_MODULE_7__["scale"] += 0.1);
+// key('z', () => {
+//     viewRect.setScale(Math.max(0, viewRect.scale - 0.1));
+// });
+// key('x', () =>{
+//     viewRect.setScale(viewRect.scale + 0.1);
+// });
 
 function draw() {
     _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].clearRect(0, 0, _canvas__WEBPACK_IMPORTED_MODULE_1__["canvas"].width, _canvas__WEBPACK_IMPORTED_MODULE_1__["canvas"].height);
-    _view_rect__WEBPACK_IMPORTED_MODULE_7__["begin"]();
+    _view_rect__WEBPACK_IMPORTED_MODULE_5__["begin"]();
     map.drawFromCache();
-    robowalkAnimation.draw(50, 50);
-    drawSprite('walk_down_0000.png', 200, 100);
-    _view_rect__WEBPACK_IMPORTED_MODULE_7__["end"]();
+    _player__WEBPACK_IMPORTED_MODULE_6__["draw"]();
+    _view_rect__WEBPACK_IMPORTED_MODULE_5__["end"]();
 }
 
 function drawSprite(spriteName, posX, posY) {
@@ -2707,7 +2693,7 @@ async function main() {
     await map.loadAndParse();
     map.makeCache();
 
-    _view_rect__WEBPACK_IMPORTED_MODULE_7__["updateSize"]();
+    _view_rect__WEBPACK_IMPORTED_MODULE_5__["updateSize"]();
 
     // mainloop
     function go() {
@@ -2723,6 +2709,64 @@ async function main() {
 }
 
 main();
+
+
+/***/ }),
+
+/***/ "./src/player.js":
+/*!***********************!*\
+  !*** ./src/player.js ***!
+  \***********************/
+/*! exports provided: update, draw, bindEvents */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "update", function() { return update; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "draw", function() { return draw; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "bindEvents", function() { return bindEvents; });
+/* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! victor */ "./node_modules/victor/index.js");
+/* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(victor__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _animation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./animation */ "./src/animation.js");
+/* harmony import */ var _view_rect__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./view-rect */ "./src/view-rect.js");
+/* harmony import */ var keymaster__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! keymaster */ "./node_modules/keymaster/keymaster.js");
+/* harmony import */ var keymaster__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(keymaster__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+
+var position = new victor__WEBPACK_IMPORTED_MODULE_0___default.a(2000, 2000);
+var speed = 0.5;
+
+var robowalkAnimation = new _animation__WEBPACK_IMPORTED_MODULE_1__["default"]({
+    images: Array(19).fill("robowalk/robowalk")
+        .map((x, i) => x + ("" + i).padStart(2, '0') + '.png'),
+    offsetX: -83/2,
+    offsetY: -83/2
+});
+
+function update(dt) {
+    robowalkAnimation.update(dt);
+    var dir = new victor__WEBPACK_IMPORTED_MODULE_0___default.a(0, 0);
+    if (keymaster__WEBPACK_IMPORTED_MODULE_3___default.a.isPressed('left')) dir.x -= 1;
+    if (keymaster__WEBPACK_IMPORTED_MODULE_3___default.a.isPressed('right')) dir.x += 1;
+    if (keymaster__WEBPACK_IMPORTED_MODULE_3___default.a.isPressed('up')) dir.y -= 1;
+    if (keymaster__WEBPACK_IMPORTED_MODULE_3___default.a.isPressed('down')) dir.y += 1;
+    if (dir.length() > 0) {
+        dir = dir.norm().multiplyScalar(speed * dt);
+        position = position.add(dir);
+    }
+    _view_rect__WEBPACK_IMPORTED_MODULE_2__["centerAt"](position.x, position.y);
+}
+
+function draw() {
+    robowalkAnimation.draw(position.x, position.y);
+}
+
+function bindEvents() {
+    window.addEventListener('mousemove', (e) => { });
+}
 
 
 /***/ }),
@@ -2897,8 +2941,8 @@ class TiledMap {
         var r = _view_rect__WEBPACK_IMPORTED_MODULE_3__;
         _canvas__WEBPACK_IMPORTED_MODULE_2__["context"].drawImage(
             c,
-            r.x, r.y, r.w, r.h,
-            r.x, r.y, r.w, r.h
+            0, 0, this.pixelSize.x, this.pixelSize.y,
+            0, 0, this.pixelSize.x, this.pixelSize.y,
         );
     }
     makeCache() {
@@ -2917,7 +2961,7 @@ class TiledMap {
 /*!**************************!*\
   !*** ./src/view-rect.js ***!
   \**************************/
-/*! exports provided: x, y, w, h, scale, getRect, updateSize, moveTo, centerAt, begin, end */
+/*! exports provided: x, y, w, h, scale, getRect, updateSize, setScale, moveTo, centerAt, beginScale, endScale, begin, end */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2929,8 +2973,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "scale", function() { return scale; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getRect", function() { return getRect; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateSize", function() { return updateSize; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setScale", function() { return setScale; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "moveTo", function() { return moveTo; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "centerAt", function() { return centerAt; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "beginScale", function() { return beginScale; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "endScale", function() { return endScale; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "begin", function() { return begin; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "end", function() { return end; });
 /* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
@@ -2946,8 +2993,12 @@ function getRect() {
 }
 
 function updateSize() {
-    w = _canvas__WEBPACK_IMPORTED_MODULE_0__["canvas"].width;
-    h = _canvas__WEBPACK_IMPORTED_MODULE_0__["canvas"].height;
+    w = _canvas__WEBPACK_IMPORTED_MODULE_0__["canvas"].width * (2 - scale);
+    h = _canvas__WEBPACK_IMPORTED_MODULE_0__["canvas"].height * (2 - scale);
+}
+
+function setScale(newScale) {
+    scale = newScale;
 }
 
 function moveTo(ax, ay) {
@@ -2956,14 +3007,22 @@ function moveTo(ax, ay) {
 }
 
 function centerAt(ax, ay) {
-    x = ax - _canvas__WEBPACK_IMPORTED_MODULE_0__["canvas"].width / 2;
-    y = ay - _canvas__WEBPACK_IMPORTED_MODULE_0__["canvas"].height / 2;
+    x = ax - w / 2;
+    y = ay - h / 2;
+}
+
+function beginScale() {
+    _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].save();
+    _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].scale(scale, scale);
+}
+
+function endScale() {
+    _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].restore();
 }
 
 function begin() {
     _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].save();
     _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].translate(-x, -y);
-    _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].scale(scale, scale);
 }
 
 function end() {

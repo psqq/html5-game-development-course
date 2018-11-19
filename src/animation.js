@@ -6,6 +6,8 @@ export default class Animation {
     constructor(options) {
         this.images = options.images || [];
         this.frameRate = options.frameRate || 1000 / 30;
+        this.offsetX = options.offsetX || 0;
+        this.offsetY = options.offsetY || 0;
         this.frameTime = 0;
         this.frame = 0;
     }
@@ -17,6 +19,6 @@ export default class Animation {
         }
     }
     draw(x, y) {
-        ctx.drawImage(images[this.images[this.frame]], x, y);
+        ctx.drawImage(images[this.images[this.frame]], this.offsetX + x, this.offsetY + y);
     }
 }

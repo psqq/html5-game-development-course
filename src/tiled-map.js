@@ -85,8 +85,8 @@ export default class TiledMap {
         var r = viewRect;
         ctx.drawImage(
             c,
-            r.x, r.y, r.w, r.h,
-            r.x, r.y, r.w, r.h
+            0, 0, this.pixelSize.x, this.pixelSize.y,
+            0, 0, this.pixelSize.x, this.pixelSize.y,
         );
     }
     makeCache() {
