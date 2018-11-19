@@ -10,4 +10,5 @@ export default class CanvasTile {
         this.can.width = width;
         this.can.height = height;
     }
+    isVisible() { }
 }

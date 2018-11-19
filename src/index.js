@@ -44,7 +44,7 @@ key('x', () => viewRect.scale += 0.1);
 function draw() {
     ctx.clearRect(0, 0, can.width, can.height);
     viewRect.begin();
-    map.draw();
+    map.drawFromCache();
     robowalkAnimation.draw(50, 50);
     drawSprite('walk_down_0000.png', 200, 100);
     viewRect.end();
@@ -82,6 +82,7 @@ async function main() {
     console.log('./assets/json/grits_effects.json parsed:');
 
     await map.loadAndParse();
+    map.makeCache();
 
     viewRect.updateSize();
 

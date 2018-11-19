@@ -2667,7 +2667,7 @@ keymaster__WEBPACK_IMPORTED_MODULE_5___default()('x', () => _view_rect__WEBPACK_
 function draw() {
     _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].clearRect(0, 0, _canvas__WEBPACK_IMPORTED_MODULE_1__["canvas"].width, _canvas__WEBPACK_IMPORTED_MODULE_1__["canvas"].height);
     _view_rect__WEBPACK_IMPORTED_MODULE_7__["begin"]();
-    map.draw();
+    map.drawFromCache();
     robowalkAnimation.draw(50, 50);
     drawSprite('walk_down_0000.png', 200, 100);
     _view_rect__WEBPACK_IMPORTED_MODULE_7__["end"]();
@@ -2705,6 +2705,7 @@ async function main() {
     console.log('./assets/json/grits_effects.json parsed:');
 
     await map.loadAndParse();
+    map.makeCache();
 
     _view_rect__WEBPACK_IMPORTED_MODULE_7__["updateSize"]();
 
@@ -2808,6 +2809,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var path_browserify__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(path_browserify__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./images */ "./src/images.js");
 /* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
+/* harmony import */ var _view_rect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./view-rect */ "./src/view-rect.js");
+
 
 
 
@@ -2820,6 +2823,7 @@ class TiledMap {
         this.tileSize = { x: 0, y: 0 };
         this.pixelSize = { x: 0, y: 0 };
         this.tileSets = [];
+        this.cachedCanvas = null;
     }
     async loadAndParse() {
         var res = await fetch(this.filename);
@@ -2865,7 +2869,8 @@ class TiledMap {
         }
         return pkt;
     }
-    draw() {
+    draw(aCtx) {
+        if (!aCtx) aCtx = _canvas__WEBPACK_IMPORTED_MODULE_2__["context"];
         for (var layer of this.mapJSON.layers) {
             if (layer.type === 'tilelayer') {
                 for (var i = 0; i < layer.data.length; i++) {
@@ -2876,7 +2881,7 @@ class TiledMap {
                     var pkt = this.getTilePacket(idx);
                     var x = this.tileSize.y * (i % this.numXTiles);
                     var y = this.tileSize.x * Math.floor(i / this.numXTiles);
-                    _canvas__WEBPACK_IMPORTED_MODULE_2__["context"].drawImage(
+                    aCtx.drawImage(
                         pkt.img,
                         pkt.px, pkt.py,
                         this.tileSize.x, this.tileSize.y,
@@ -2887,6 +2892,22 @@ class TiledMap {
             }
         }
     }
+    drawFromCache() {
+        var c = this.cachedCanvas;
+        var r = _view_rect__WEBPACK_IMPORTED_MODULE_3__;
+        _canvas__WEBPACK_IMPORTED_MODULE_2__["context"].drawImage(
+            c,
+            r.x, r.y, r.w, r.h,
+            r.x, r.y, r.w, r.h
+        );
+    }
+    makeCache() {
+        this.cachedCanvas = document.createElement('canvas');
+        this.cachedCanvas.width = this.pixelSize.x;
+        this.cachedCanvas.height = this.pixelSize.y;
+        var cachedCtx = this.cachedCanvas.getContext('2d');
+        this.draw(cachedCtx);
+    }
 }
 
 
@@ -2896,7 +2917,7 @@ class TiledMap {
 /*!**************************!*\
   !*** ./src/view-rect.js ***!
   \**************************/
-/*! exports provided: x, y, w, h, scale, updateSize, moveTo, centerAt, begin, end */
+/*! exports provided: x, y, w, h, scale, getRect, updateSize, moveTo, centerAt, begin, end */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2906,6 +2927,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "w", function() { return w; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return h; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "scale", function() { return scale; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getRect", function() { return getRect; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateSize", function() { return updateSize; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "moveTo", function() { return moveTo; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "centerAt", function() { return centerAt; });
@@ -2915,6 +2937,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var x = 0, y = 0, w = 0, h = 0, scale = 1;
+
+function getRect() {
+    return {
+        left: x, right: x + w,
+        top: y, bottom: y + h
+    };
+}
 
 function updateSize() {
     w = _canvas__WEBPACK_IMPORTED_MODULE_0__["canvas"].width;

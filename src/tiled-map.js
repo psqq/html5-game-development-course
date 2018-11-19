@@ -1,6 +1,7 @@
 import path from 'path-browserify';
 import { loadImage } from './images';
 import { context as ctx } from './canvas';
+import * as viewRect from './view-rect';
 
 export default class TiledMap {
     constructor(filename) {
@@ -10,6 +11,7 @@ export default class TiledMap {
         this.tileSize = { x: 0, y: 0 };
         this.pixelSize = { x: 0, y: 0 };
         this.tileSets = [];
+        this.cachedCanvas = null;
     }
     async loadAndParse() {
         var res = await fetch(this.filename);
@@ -55,7 +57,8 @@ export default class TiledMap {
         }
         return pkt;
     }
-    draw() {
+    draw(aCtx) {
+        if (!aCtx) aCtx = ctx;
         for (var layer of this.mapJSON.layers) {
             if (layer.type === 'tilelayer') {
                 for (var i = 0; i < layer.data.length; i++) {
@@ -66,7 +69,7 @@ export default class TiledMap {
                     var pkt = this.getTilePacket(idx);
                     var x = this.tileSize.y * (i % this.numXTiles);
                     var y = this.tileSize.x * Math.floor(i / this.numXTiles);
-                    ctx.drawImage(
+                    aCtx.drawImage(
                         pkt.img,
                         pkt.px, pkt.py,
                         this.tileSize.x, this.tileSize.y,
@@ -76,5 +79,21 @@ export default class TiledMap {
                 }
             }
         }
+    }
+    drawFromCache() {
+        var c = this.cachedCanvas;
+        var r = viewRect;
+        ctx.drawImage(
+            c,
+            r.x, r.y, r.w, r.h,
+            r.x, r.y, r.w, r.h
+        );
+    }
+    makeCache() {
+        this.cachedCanvas = document.createElement('canvas');
+        this.cachedCanvas.width = this.pixelSize.x;
+        this.cachedCanvas.height = this.pixelSize.y;
+        var cachedCtx = this.cachedCanvas.getContext('2d');
+        this.draw(cachedCtx);
     }
 }

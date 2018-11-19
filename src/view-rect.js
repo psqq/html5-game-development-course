@@ -5,6 +5,13 @@ import {
 
 export var x = 0, y = 0, w = 0, h = 0, scale = 1;
 
+export function getRect() {
+    return {
+        left: x, right: x + w,
+        top: y, bottom: y + h
+    };
+}
+
 export function updateSize() {
     w = can.width;
     h = can.height;
