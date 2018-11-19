@@ -4,45 +4,32 @@ import * as viewRect from './view-rect';
 import key from 'keymaster';
 import * as physicsEngine from './physics-engine';
 import { context as ctx } from './canvas';
+import { dt } from './mainloop';
+import * as gameEngine from './game-engine';
 
-var body;
-var vel = new Victor(0, 0);
-var speed = 0.5;
-
-var robowalkAnimation = new ImageAnimation({
-    images: Array(19).fill("robowalk")
-        .map((x, i) => x + ("" + i).padStart(2, '0') + '.png'),
-    offsetX: -83 / 2,
-    offsetY: -83 / 2
-});
+var robotEntity;
 
 export function create() {
-    body = physicsEngine.addBody(2000, 2000, 83, 83);
+    robotEntity = gameEngine.spawnEnitty('robot', {
+        x: 2000, y: 2000
+    });
 }
 
-export function update(dt) {
-    robowalkAnimation.update(dt);
-    vel.x = vel.y = 0;
-    if (key.isPressed('left')) vel.x -= 1;
-    if (key.isPressed('right')) vel.x += 1;
-    if (key.isPressed('up')) vel.y -= 1;
-    if (key.isPressed('down')) vel.y += 1;
-    if (vel.length() > 0) {
-        vel = vel.norm().multiplyScalar(speed * dt);
+export function update() {
+    if (key.isPressed('a')) {
+        robotEntity.moveLeft();
+    } else if (key.isPressed('d')) {
+        robotEntity.moveRight();
+    } else if (key.isPressed('w')) {
+        robotEntity.moveUp();
     }
-    physicsEngine.Body.setVelocity(
-        body,
-        new physicsEngine.Vector.create(vel.x, vel.y)
-    );
-    viewRect.centerAt(body.position.x, body.position.y);
-}
-
-export function draw() {
-    robowalkAnimation.draw(body.position.x, body.position.y);
-}
-
-export function drawBody() {
-    physicsEngine.drawBody(body, 'blue');
+    else if (key.isPressed('s')) {
+        robotEntity.moveDown();
+    }
+    else {
+        robotEntity.stopMoving();
+    }
+    viewRect.centerAt(robotEntity.body.position.x, robotEntity.body.position.y);
 }
 
 export function bindEvents() {

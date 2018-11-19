@@ -8,35 +8,26 @@ import TiledMap from './tiled-map';
 import * as viewRect from './view-rect';
 import * as player from './player';
 import * as physicsEngine from './physics-engine';
+import * as gameEngine from './game-engine';
 import SpriteAnimation from './sprite-animation';
-
-var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
+import * as mainloop from './mainloop';
 
 var map = new TiledMap('./assets/json/map.json');
 
 var teleporterIdleAnimation;
 
 function update() {
-    player.update(dt);
-    teleporterIdleAnimation.update(dt);
+    player.update();
+    gameEngine.update();
     viewRect.updateSize();
-    physicsEngine.update(dt);
+    physicsEngine.update();
 }
 
 function draw() {
     ctx.clearRect(0, 0, can.width, can.height);
     viewRect.begin();
     map.drawFromCache();
-    // map.drawStaticObjects();
-    player.draw();
-
-    teleporterIdleAnimation.draw(2000, 2000);
-
-    // images.findAndDrawSprite('teleporter_idle_0015.png', 2000, 2000);
-
-    // player.drawBody();
-    // physicsEngine.drawStaticBodyes();
-
+    gameEngine.draw();
     viewRect.end();
 }
 
@@ -61,17 +52,9 @@ async function main() {
     player.create();
     map.createStaticObjects();
 
-    // mainloop
-    function go() {
-        timestamp = performance.now();
-        dt = timestamp - timeOfLastUpdate;
-        timeOfLastUpdate = timestamp;
-        update();
-        draw();
-        requestAnimationFrame(go);
-    }
-    timeOfLastUpdate = performance.now();
-    requestAnimationFrame(go);
+    mainloop.setUpdate(update);
+    mainloop.setDraw(draw);
+    mainloop.run();
 }
 
 main();

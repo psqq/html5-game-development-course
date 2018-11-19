@@ -1,11 +1,13 @@
 import Matter from 'matter-js';
 import { context as ctx } from './canvas';
+import { dt } from './mainloop';
 
 export var Engine = Matter.Engine,
     Render = Matter.Render,
     World = Matter.World,
     Body = Matter.Body,
     Vector = Matter.Vector,
+    Composite = Matter.Composite,
     Bodies = Matter.Bodies;
 
 var engine, world;
@@ -26,10 +28,7 @@ export function addBody(x, y, w, h, options) {
 }
 
 export function removeBody(body) {
-    World.remove(body);
-}
-
-export function clearForces() {
+    Composite.remove(world, body)
 }
 
 export function create() {
@@ -39,7 +38,7 @@ export function create() {
     world.gravity.x = 0;
 }
 
-export function update(dt) {
+export function update() {
     Engine.update(engine, dt);
 }
 

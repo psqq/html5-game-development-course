@@ -1,18 +1,18 @@
 import * as viewRect from './view-rect';
+import * as factory from './entities-factory';
 
 var entities = [];
-var factory = {};
 var _deferredKill = [];
 
-export function spawnEnitty(typename) {
-    var ent = new (factory[typename])();
+export function spawnEnitty(typename, options) {
+    var ent = new (factory[typename])(options);
     entities.push(ent);
     return ent;
 }
 
 export function update() {
     for(var ent of entities) {
-        if (ent._killed) {
+        if (!ent._killed) {
             ent.update();
         } else {
             _deferredKill.push(ent);

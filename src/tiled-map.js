@@ -1,8 +1,8 @@
 import path from 'path-browserify';
-import { loadImage } from './images';
 import { context as ctx } from './canvas';
 import * as viewRect from './view-rect';
 import * as physicsEngine from './physics-engine';
+import * as images from './images';
 
 export default class TiledMap {
     constructor(filename) {
@@ -30,7 +30,7 @@ export default class TiledMap {
         for (var tileset of json.tilesets) {
             var curDir = path.dirname(this.filename);
             var fn = path.join(curDir, tileset.image);
-            var img = await loadImage(fn);
+            var img = images.images[path.basename(fn)];
             this.tileSets.push({
                 image: img,
                 firstgid: tileset.firstgid,

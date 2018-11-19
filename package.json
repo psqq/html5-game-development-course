@@ -10,7 +10,9 @@
   "devDependencies": {
     "del": "^3.0.0",
     "keymaster": "^1.6.2",
+    "lodash": "^4.17.11",
     "matter-js": "^0.14.2",
+    "pad": "^2.2.1",
     "path-browserify": "^1.0.0",
     "victor": "^1.1.0",
     "webpack": "^4.25.1",

@@ -1,5 +1,6 @@
 import { context as ctx } from './canvas';
 import { images } from './images';
+import { dt } from './mainloop';
 
 
 export default class ImageAnimation {
@@ -11,7 +12,7 @@ export default class ImageAnimation {
         this.frameTime = 0;
         this.frame = 0;
     }
-    update(dt) {
+    update() {
         this.frameTime += dt;
         if (this.frameTime > this.frameRate) {
             this.frame = (this.frame + 1) % this.images.length;
