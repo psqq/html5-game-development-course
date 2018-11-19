@@ -2,6 +2,7 @@ import path from 'path-browserify';
 import { loadImage } from './images';
 import { context as ctx } from './canvas';
 import * as viewRect from './view-rect';
+import * as physicsEngine from './physics-engine';
 
 export default class TiledMap {
     constructor(filename) {
@@ -95,5 +96,28 @@ export default class TiledMap {
         this.cachedCanvas.height = this.pixelSize.y;
         var cachedCtx = this.cachedCanvas.getContext('2d');
         this.draw(cachedCtx);
+    }
+    createStaticObjects() {
+        for (var layer of this.mapJSON.layers) {
+            if (layer.type === 'objectgroup' && layer.name === 'collision') {
+                for (var obj of layer.objects) {
+                    physicsEngine.addBody(
+                        obj.x, obj.y, obj.width, obj.height,
+                        {
+                            isStatic: true
+                        }
+                    );
+                }
+            }
+        }
+    }
+    drawStaticObjects() {
+        for (var layer of this.mapJSON.layers) {
+            if (layer.type === 'objectgroup' && layer.name === 'collision') {
+                for (var obj of layer.objects) {
+                    ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
+                }
+            }
+        }
     }
 }

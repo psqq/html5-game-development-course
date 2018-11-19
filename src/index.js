@@ -9,6 +9,7 @@ import TiledMap from './tiled-map';
 import key from 'keymaster';
 import * as viewRect from './view-rect';
 import * as player from './player';
+import * as physicsEngine from './physics-engine';
 
 var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
 
@@ -19,6 +20,7 @@ var map = new TiledMap('./assets/json/map.json');
 function update() {
     player.update(dt);
     viewRect.updateSize();
+    physicsEngine.update(dt);
 }
 
 // key('z', () => {
@@ -32,7 +34,12 @@ function draw() {
     ctx.clearRect(0, 0, can.width, can.height);
     viewRect.begin();
     map.drawFromCache();
+    // map.drawStaticObjects();
     player.draw();
+
+    // player.drawBody();
+    // physicsEngine.drawStaticBodyes();
+
     viewRect.end();
 }
 
@@ -65,12 +72,15 @@ async function main() {
     await sheet1.loadAndParse();
     spriteSheets['grits_effects'] = sheet1;
 
-    console.log('./assets/json/grits_effects.json parsed:');
-
     await map.loadAndParse();
     map.makeCache();
 
     viewRect.updateSize();
+
+    physicsEngine.create();
+
+    player.create();
+    map.createStaticObjects();
 
     // mainloop
     function go() {
