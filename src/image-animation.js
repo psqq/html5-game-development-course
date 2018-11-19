@@ -2,7 +2,7 @@ import { context as ctx } from './canvas';
 import { images } from './images';
 
 
-export default class Animation {
+export default class ImageAnimation {
     constructor(options) {
         this.images = options.images || [];
         this.frameRate = options.frameRate || 1000 / 30;

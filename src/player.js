@@ -1,5 +1,5 @@
 import Victor from 'victor';
-import Animation from './animation';
+import ImageAnimation from './image-animation';
 import * as viewRect from './view-rect';
 import key from 'keymaster';
 import * as physicsEngine from './physics-engine';
@@ -9,8 +9,8 @@ var body;
 var vel = new Victor(0, 0);
 var speed = 0.5;
 
-var robowalkAnimation = new Animation({
-    images: Array(19).fill("robowalk/robowalk")
+var robowalkAnimation = new ImageAnimation({
+    images: Array(19).fill("robowalk")
         .map((x, i) => x + ("" + i).padStart(2, '0') + '.png'),
     offsetX: -83 / 2,
     offsetY: -83 / 2

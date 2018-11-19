@@ -1,4 +1,5 @@
 import { images } from './images';
+import path from 'path-browserify';
 
 export default class TexturepackerParser {
     constructor(filename) {
@@ -33,7 +34,7 @@ export default class TexturepackerParser {
         this.sprites.push(spt);
     }
     parseAtlasDefinition() {
-        this.img = images[this.atlasJSON.meta.image];
+        this.img = images[path.basename(this.atlasJSON.meta.image)];
         for (var name in this.atlasJSON.frames) {
             var sprite = this.atlasJSON.frames[name];
             var cx = -sprite.frame.w / 2;

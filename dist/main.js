@@ -12869,46 +12869,6 @@ module.exports = g;
 
 /***/ }),
 
-/***/ "./src/animation.js":
-/*!**************************!*\
-  !*** ./src/animation.js ***!
-  \**************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Animation; });
-/* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
-/* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./images */ "./src/images.js");
-
-
-
-
-class Animation {
-    constructor(options) {
-        this.images = options.images || [];
-        this.frameRate = options.frameRate || 1000 / 30;
-        this.offsetX = options.offsetX || 0;
-        this.offsetY = options.offsetY || 0;
-        this.frameTime = 0;
-        this.frame = 0;
-    }
-    update(dt) {
-        this.frameTime += dt;
-        if (this.frameTime > this.frameRate) {
-            this.frame = (this.frame + 1) % this.images.length;
-            this.frameTime = 0;
-        }
-    }
-    draw(x, y) {
-        _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].drawImage(_images__WEBPACK_IMPORTED_MODULE_1__["images"][this.images[this.frame]], this.offsetX + x, this.offsetY + y);
-    }
-}
-
-
-/***/ }),
-
 /***/ "./src/canvas.js":
 /*!***********************!*\
   !*** ./src/canvas.js ***!
@@ -12939,33 +12899,71 @@ function makeAlwaysCanvasFullscreen() {
 
 /***/ }),
 
-/***/ "./src/images.js":
-/*!***********************!*\
-  !*** ./src/images.js ***!
-  \***********************/
-/*! exports provided: robowalkImages, images, loadImage, loadAllImages */
+/***/ "./src/image-animation.js":
+/*!********************************!*\
+  !*** ./src/image-animation.js ***!
+  \********************************/
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "robowalkImages", function() { return robowalkImages; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ImageAnimation; });
+/* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
+/* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./images */ "./src/images.js");
+
+
+
+
+class ImageAnimation {
+    constructor(options) {
+        this.images = options.images || [];
+        this.frameRate = options.frameRate || 1000 / 30;
+        this.offsetX = options.offsetX || 0;
+        this.offsetY = options.offsetY || 0;
+        this.frameTime = 0;
+        this.frame = 0;
+    }
+    update(dt) {
+        this.frameTime += dt;
+        if (this.frameTime > this.frameRate) {
+            this.frame = (this.frame + 1) % this.images.length;
+            this.frameTime = 0;
+        }
+    }
+    draw(x, y) {
+        _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].drawImage(_images__WEBPACK_IMPORTED_MODULE_1__["images"][this.images[this.frame]], this.offsetX + x, this.offsetY + y);
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/images.js":
+/*!***********************!*\
+  !*** ./src/images.js ***!
+  \***********************/
+/*! exports provided: images, loadImage, loadAll, findSprite, findAndDrawSprite, drawSprite */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "images", function() { return images; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadImage", function() { return loadImage; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadAllImages", function() { return loadAllImages; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadAll", function() { return loadAll; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "findSprite", function() { return findSprite; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "findAndDrawSprite", function() { return findAndDrawSprite; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "drawSprite", function() { return drawSprite; });
+/* harmony import */ var path_browserify__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! path-browserify */ "./node_modules/path-browserify/index.js");
+/* harmony import */ var path_browserify__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(path_browserify__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _texturepacker_parser__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./texturepacker-parser */ "./src/texturepacker-parser.js");
+/* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
 
-var robowalkWhere = './assets/images/robowalk/';
-var robowalkAssets = [
-    'robowalk00.png', 'robowalk01.png', 'robowalk02.png',
-    'robowalk03.png', 'robowalk04.png', 'robowalk05.png',
-    'robowalk06.png', 'robowalk07.png', 'robowalk08.png',
-    'robowalk09.png', 'robowalk10.png', 'robowalk11.png',
-    'robowalk12.png', 'robowalk13.png', 'robowalk14.png',
-    'robowalk15.png', 'robowalk16.png', 'robowalk17.png',
-    'robowalk18.png',
-];
 
-var imagesWhere = './assets/images/';
-var imagesAssets = [
+
+
+var imagesDir = './assets/images/';
+var imagesPaths = [
     "robowalk/robowalk00.png", "robowalk/robowalk01.png", "robowalk/robowalk02.png",
     "robowalk/robowalk03.png", "robowalk/robowalk04.png", "robowalk/robowalk05.png",
     "robowalk/robowalk06.png", "robowalk/robowalk07.png", "robowalk/robowalk08.png",
@@ -12978,7 +12976,10 @@ var imagesAssets = [
     'ralphyrobot.png',
 ];
 
-var robowalkImages = [];
+var spriteSheetsDir = './assets/json/';
+var spriteSheetsPaths = ['grits_effects.json'];
+
+var spriteSheets = {};
 
 var images = {};
 
@@ -12992,21 +12993,61 @@ function loadImage(filename) {
 }
 
 async function loadAllImages() {
-    // Load robowalk images
     var promises = [];
-    for (var filename of robowalkAssets) {
-        promises.push(loadImage(robowalkWhere + filename));
-    }
-    robowalkImages = await Promise.all(promises);
-    // Load other images
-    promises = [];
-    for (var filename of imagesAssets) {
-        promises.push(loadImage(imagesWhere + filename));
+    for (var filename of imagesPaths) {
+        promises.push(loadImage(imagesDir + filename));
     }
     var imagesArr = await Promise.all(promises);
-    for (var i = 0; i < imagesAssets.length; i++) {
-        images[imagesAssets[i]] = imagesArr[i];
+    for (var i = 0; i < imagesPaths.length; i++) {
+        var basename = path_browserify__WEBPACK_IMPORTED_MODULE_0___default.a.basename(imagesPaths[i]);
+        images[basename] = imagesArr[i];
     }
+}
+
+async function loadAllSpriteSheets() {
+    var promises = [];
+    for (var filename of spriteSheetsPaths) {
+        var name = path_browserify__WEBPACK_IMPORTED_MODULE_0___default.a.parse(filename).name;
+        var spriteSheet = new _texturepacker_parser__WEBPACK_IMPORTED_MODULE_1__["default"](path_browserify__WEBPACK_IMPORTED_MODULE_0___default.a.join(spriteSheetsDir, filename));
+        spriteSheets[name] = spriteSheet;
+        promises.push(spriteSheet.loadAndParse());
+    }
+    await Promise.all(promises);
+}
+
+async function loadAll() {
+    await loadAllImages();
+    await loadAllSpriteSheets();
+}
+
+function findSprite(spriteName) {
+    for (var sheetName in spriteSheets) {
+        var sheet = spriteSheets[sheetName];
+        var sprite = sheet.getStats(spriteName);
+        if (sprite == null) continue;
+        return { sheet, sprite };
+    }
+    return null;
+}
+
+function findAndDrawSprite(spriteName, posX, posY) {
+    var findResult = findSprite(spriteName);
+    if (!findResult) {
+        return;
+    }
+    drawSprite(findResult.sprite, findResult.sheet, posX, posY);
+}
+
+function drawSprite(spt, sheet, posX, posY) {
+    if (spt == null || sheet == null) return;
+    var hlf = {
+        x: spt.cx, y: spt.cy
+    };
+    _canvas__WEBPACK_IMPORTED_MODULE_2__["context"].drawImage(
+        sheet.img,
+        spt.x, spt.y, spt.w, spt.h,
+        posX + hlf.x, posY + hlf.y, spt.w, spt.h
+    );
 }
 
 
@@ -13021,16 +13062,13 @@ async function loadAllImages() {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./texturepacker-parser */ "./src/texturepacker-parser.js");
-/* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
-/* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./images */ "./src/images.js");
-/* harmony import */ var _tiled_map__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./tiled-map */ "./src/tiled-map.js");
-/* harmony import */ var keymaster__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! keymaster */ "./node_modules/keymaster/keymaster.js");
-/* harmony import */ var keymaster__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(keymaster__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _view_rect__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./view-rect */ "./src/view-rect.js");
-/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./player */ "./src/player.js");
-/* harmony import */ var _physics_engine__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./physics-engine */ "./src/physics-engine.js");
-
+/* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
+/* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./images */ "./src/images.js");
+/* harmony import */ var _tiled_map__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tiled-map */ "./src/tiled-map.js");
+/* harmony import */ var _view_rect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./view-rect */ "./src/view-rect.js");
+/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./player */ "./src/player.js");
+/* harmony import */ var _physics_engine__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./physics-engine */ "./src/physics-engine.js");
+/* harmony import */ var _sprite_animation__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./sprite-animation */ "./src/sprite-animation.js");
 
 
 
@@ -13041,73 +13079,53 @@ __webpack_require__.r(__webpack_exports__);
 
 var timestamp = 0, timeOfLastUpdate = 0, dt = 0;
 
-var spriteSheets = {};
+var map = new _tiled_map__WEBPACK_IMPORTED_MODULE_2__["default"]('./assets/json/map.json');
 
-var map = new _tiled_map__WEBPACK_IMPORTED_MODULE_3__["default"]('./assets/json/map.json');
+var teleporterIdleAnimation;
 
 function update() {
-    _player__WEBPACK_IMPORTED_MODULE_6__["update"](dt);
-    _view_rect__WEBPACK_IMPORTED_MODULE_5__["updateSize"]();
-    _physics_engine__WEBPACK_IMPORTED_MODULE_7__["update"](dt);
+    _player__WEBPACK_IMPORTED_MODULE_4__["update"](dt);
+    teleporterIdleAnimation.update(dt);
+    _view_rect__WEBPACK_IMPORTED_MODULE_3__["updateSize"]();
+    _physics_engine__WEBPACK_IMPORTED_MODULE_5__["update"](dt);
 }
 
-// key('z', () => {
-//     viewRect.setScale(Math.max(0, viewRect.scale - 0.1));
-// });
-// key('x', () =>{
-//     viewRect.setScale(viewRect.scale + 0.1);
-// });
-
 function draw() {
-    _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].clearRect(0, 0, _canvas__WEBPACK_IMPORTED_MODULE_1__["canvas"].width, _canvas__WEBPACK_IMPORTED_MODULE_1__["canvas"].height);
-    _view_rect__WEBPACK_IMPORTED_MODULE_5__["begin"]();
+    _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].clearRect(0, 0, _canvas__WEBPACK_IMPORTED_MODULE_0__["canvas"].width, _canvas__WEBPACK_IMPORTED_MODULE_0__["canvas"].height);
+    _view_rect__WEBPACK_IMPORTED_MODULE_3__["begin"]();
     map.drawFromCache();
     // map.drawStaticObjects();
-    _player__WEBPACK_IMPORTED_MODULE_6__["draw"]();
+    _player__WEBPACK_IMPORTED_MODULE_4__["draw"]();
+
+    teleporterIdleAnimation.draw(2000, 2000);
+
+    // images.findAndDrawSprite('teleporter_idle_0015.png', 2000, 2000);
 
     // player.drawBody();
     // physicsEngine.drawStaticBodyes();
 
-    _view_rect__WEBPACK_IMPORTED_MODULE_5__["end"]();
-}
-
-function drawSprite(spriteName, posX, posY) {
-    for (var sheetName in spriteSheets) {
-        var sheet = spriteSheets[sheetName];
-        var sprite = sheet.getStats(spriteName);
-        if (sprite == null) continue;
-        __drawSpriteInternal(sprite, sheet, posX, posY);
-    }
-}
-
-function __drawSpriteInternal(spt, sheet, posX, posY) {
-    if (spt == null || sheet == null) return;
-    var hlf = {
-        x: spt.cx, y: spt.cy
-    };
-    _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].drawImage(
-        sheet.img,
-        spt.x, spt.y, spt.w, spt.h,
-        posX + hlf.x, posY + hlf.y, spt.w, spt.h
-    );
+    _view_rect__WEBPACK_IMPORTED_MODULE_3__["end"]();
 }
 
 async function main() {
-    Object(_canvas__WEBPACK_IMPORTED_MODULE_1__["makeAlwaysCanvasFullscreen"])();
-    await Object(_images__WEBPACK_IMPORTED_MODULE_2__["loadAllImages"])();
+    Object(_canvas__WEBPACK_IMPORTED_MODULE_0__["makeAlwaysCanvasFullscreen"])();
+    await _images__WEBPACK_IMPORTED_MODULE_1__["loadAll"]();
 
-    var sheet1 = new _texturepacker_parser__WEBPACK_IMPORTED_MODULE_0__["default"]('./assets/json/grits_effects.json');
-    await sheet1.loadAndParse();
-    spriteSheets['grits_effects'] = sheet1;
+    console.log('teleporter_idle_0015.png', _images__WEBPACK_IMPORTED_MODULE_1__["findSprite"]('teleporter_idle_0015.png'));
+
+    teleporterIdleAnimation = new _sprite_animation__WEBPACK_IMPORTED_MODULE_6__["default"]({
+        spriteNames: Array(16).fill("teleporter_idle_")
+            .map((x, i) => x + ("" + i).padStart(4, '0') + '.png'),
+    });
 
     await map.loadAndParse();
     map.makeCache();
 
-    _view_rect__WEBPACK_IMPORTED_MODULE_5__["updateSize"]();
+    _view_rect__WEBPACK_IMPORTED_MODULE_3__["updateSize"]();
 
-    _physics_engine__WEBPACK_IMPORTED_MODULE_7__["create"]();
+    _physics_engine__WEBPACK_IMPORTED_MODULE_5__["create"]();
 
-    _player__WEBPACK_IMPORTED_MODULE_6__["create"]();
+    _player__WEBPACK_IMPORTED_MODULE_4__["create"]();
     map.createStaticObjects();
 
     // mainloop
@@ -13236,7 +13254,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "bindEvents", function() { return bindEvents; });
 /* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! victor */ "./node_modules/victor/index.js");
 /* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(victor__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _animation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./animation */ "./src/animation.js");
+/* harmony import */ var _image_animation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./image-animation */ "./src/image-animation.js");
 /* harmony import */ var _view_rect__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./view-rect */ "./src/view-rect.js");
 /* harmony import */ var keymaster__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! keymaster */ "./node_modules/keymaster/keymaster.js");
 /* harmony import */ var keymaster__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(keymaster__WEBPACK_IMPORTED_MODULE_3__);
@@ -13253,8 +13271,8 @@ var body;
 var vel = new victor__WEBPACK_IMPORTED_MODULE_0___default.a(0, 0);
 var speed = 0.5;
 
-var robowalkAnimation = new _animation__WEBPACK_IMPORTED_MODULE_1__["default"]({
-    images: Array(19).fill("robowalk/robowalk")
+var robowalkAnimation = new _image_animation__WEBPACK_IMPORTED_MODULE_1__["default"]({
+    images: Array(19).fill("robowalk")
         .map((x, i) => x + ("" + i).padStart(2, '0') + '.png'),
     offsetX: -83 / 2,
     offsetY: -83 / 2
@@ -13296,6 +13314,52 @@ function bindEvents() {
 
 /***/ }),
 
+/***/ "./src/sprite-animation.js":
+/*!*********************************!*\
+  !*** ./src/sprite-animation.js ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SpriteAnimation; });
+/* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./images */ "./src/images.js");
+
+
+
+class SpriteAnimation {
+    constructor(options) {
+        this.spriteNames = options.spriteNames || [];
+        this.findedSprites = [];
+        for (var spriteName of this.spriteNames) {
+            this.findedSprites.push(_images__WEBPACK_IMPORTED_MODULE_0__["findSprite"](spriteName));
+        }
+        this.frameRate = options.frameRate || 1000 / 30;
+        this.offsetX = options.offsetX || 0;
+        this.offsetY = options.offsetY || 0;
+        this.frameTime = 0;
+        this.frame = 0;
+    }
+    update(dt) {
+        this.frameTime += dt;
+        if (this.frameTime > this.frameRate) {
+            this.frame = (this.frame + 1) % this.findedSprites.length;
+            this.frameTime = 0;
+        }
+    }
+    draw(x, y) {
+        var findResult = this.findedSprites[this.frame];
+        _images__WEBPACK_IMPORTED_MODULE_0__["drawSprite"](
+            findResult.sprite, findResult.sheet,
+            this.offsetX + x, this.offsetY + y
+        );
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/texturepacker-parser.js":
 /*!*************************************!*\
   !*** ./src/texturepacker-parser.js ***!
@@ -13307,6 +13371,9 @@ function bindEvents() {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return TexturepackerParser; });
 /* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./images */ "./src/images.js");
+/* harmony import */ var path_browserify__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! path-browserify */ "./node_modules/path-browserify/index.js");
+/* harmony import */ var path_browserify__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(path_browserify__WEBPACK_IMPORTED_MODULE_1__);
+
 
 
 class TexturepackerParser {
@@ -13342,7 +13409,7 @@ class TexturepackerParser {
         this.sprites.push(spt);
     }
     parseAtlasDefinition() {
-        this.img = _images__WEBPACK_IMPORTED_MODULE_0__["images"][this.atlasJSON.meta.image];
+        this.img = _images__WEBPACK_IMPORTED_MODULE_0__["images"][path_browserify__WEBPACK_IMPORTED_MODULE_1___default.a.basename(this.atlasJSON.meta.image)];
         for (var name in this.atlasJSON.frames) {
             var sprite = this.atlasJSON.frames[name];
             var cx = -sprite.frame.w / 2;

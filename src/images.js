@@ -1,17 +1,9 @@
+import path from 'path-browserify';
+import TexturepackerParser from './texturepacker-parser';
+import { context as ctx } from './canvas';
 
-var robowalkWhere = './assets/images/robowalk/';
-var robowalkAssets = [
-    'robowalk00.png', 'robowalk01.png', 'robowalk02.png',
-    'robowalk03.png', 'robowalk04.png', 'robowalk05.png',
-    'robowalk06.png', 'robowalk07.png', 'robowalk08.png',
-    'robowalk09.png', 'robowalk10.png', 'robowalk11.png',
-    'robowalk12.png', 'robowalk13.png', 'robowalk14.png',
-    'robowalk15.png', 'robowalk16.png', 'robowalk17.png',
-    'robowalk18.png',
-];
-
-var imagesWhere = './assets/images/';
-var imagesAssets = [
+var imagesDir = './assets/images/';
+var imagesPaths = [
     "robowalk/robowalk00.png", "robowalk/robowalk01.png", "robowalk/robowalk02.png",
     "robowalk/robowalk03.png", "robowalk/robowalk04.png", "robowalk/robowalk05.png",
     "robowalk/robowalk06.png", "robowalk/robowalk07.png", "robowalk/robowalk08.png",
@@ -24,7 +16,10 @@ var imagesAssets = [
     'ralphyrobot.png',
 ];
 
-export var robowalkImages = [];
+var spriteSheetsDir = './assets/json/';
+var spriteSheetsPaths = ['grits_effects.json'];
+
+var spriteSheets = {};
 
 export var images = {};
 
@@ -37,20 +32,60 @@ export function loadImage(filename) {
     });
 }
 
-export async function loadAllImages() {
-    // Load robowalk images
+async function loadAllImages() {
     var promises = [];
-    for (var filename of robowalkAssets) {
-        promises.push(loadImage(robowalkWhere + filename));
-    }
-    robowalkImages = await Promise.all(promises);
-    // Load other images
-    promises = [];
-    for (var filename of imagesAssets) {
-        promises.push(loadImage(imagesWhere + filename));
+    for (var filename of imagesPaths) {
+        promises.push(loadImage(imagesDir + filename));
     }
     var imagesArr = await Promise.all(promises);
-    for (var i = 0; i < imagesAssets.length; i++) {
-        images[imagesAssets[i]] = imagesArr[i];
+    for (var i = 0; i < imagesPaths.length; i++) {
+        var basename = path.basename(imagesPaths[i]);
+        images[basename] = imagesArr[i];
     }
+}
+
+async function loadAllSpriteSheets() {
+    var promises = [];
+    for (var filename of spriteSheetsPaths) {
+        var name = path.parse(filename).name;
+        var spriteSheet = new TexturepackerParser(path.join(spriteSheetsDir, filename));
+        spriteSheets[name] = spriteSheet;
+        promises.push(spriteSheet.loadAndParse());
+    }
+    await Promise.all(promises);
+}
+
+export async function loadAll() {
+    await loadAllImages();
+    await loadAllSpriteSheets();
+}
+
+export function findSprite(spriteName) {
+    for (var sheetName in spriteSheets) {
+        var sheet = spriteSheets[sheetName];
+        var sprite = sheet.getStats(spriteName);
+        if (sprite == null) continue;
+        return { sheet, sprite };
+    }
+    return null;
+}
+
+export function findAndDrawSprite(spriteName, posX, posY) {
+    var findResult = findSprite(spriteName);
+    if (!findResult) {
+        return;
+    }
+    drawSprite(findResult.sprite, findResult.sheet, posX, posY);
+}
+
+export function drawSprite(spt, sheet, posX, posY) {
+    if (spt == null || sheet == null) return;
+    var hlf = {
+        x: spt.cx, y: spt.cy
+    };
+    ctx.drawImage(
+        sheet.img,
+        spt.x, spt.y, spt.w, spt.h,
+        posX + hlf.x, posY + hlf.y, spt.w, spt.h
+    );
 }
