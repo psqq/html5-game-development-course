@@ -3,6 +3,7 @@ import { context as ctx } from './canvas';
 import * as viewRect from './view-rect';
 import * as physicsEngine from './physics-engine';
 import * as images from './images';
+import * as gameEngine from './game-engine';
 
 export default class TiledMap {
     constructor(filename) {
@@ -102,7 +103,9 @@ export default class TiledMap {
             if (layer.type === 'objectgroup' && layer.name === 'collision') {
                 for (var obj of layer.objects) {
                     physicsEngine.addBody(
-                        obj.x, obj.y, obj.width, obj.height,
+                        obj.x + obj.width / 2,
+                        obj.y + obj.height / 2,
+                        obj.width, obj.height,
                         {
                             isStatic: true
                         }
@@ -116,6 +119,22 @@ export default class TiledMap {
             if (layer.type === 'objectgroup' && layer.name === 'collision') {
                 for (var obj of layer.objects) {
                     ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
+                }
+            }
+        }
+    }
+    spawnTeleporters() {
+        for (var layer of this.mapJSON.layers) {
+            if (layer.type === 'objectgroup' && layer.name === 'environment') {
+                for (var obj of layer.objects) {
+                    if (obj.name === 'TP') {
+                        gameEngine.spawnEnitty('teleporter', {
+                            x: obj.x + obj.width / 2,
+                            y: obj.y + obj.height / 2,
+                            w: obj.width,
+                            h: obj.height
+                        });
+                    }
                 }
             }
         }

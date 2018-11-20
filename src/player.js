@@ -11,7 +11,7 @@ var robotEntity;
 
 export function create() {
     robotEntity = gameEngine.spawnEnitty('robot', {
-        x: 2000, y: 2000
+        x: 2900, y: 2050
     });
 }
 

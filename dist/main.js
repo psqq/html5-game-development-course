@@ -32915,6 +32915,7 @@ async function main() {
 
     _player__WEBPACK_IMPORTED_MODULE_4__["create"]();
     map.createStaticObjects();
+    map.spawnTeleporters();
 
     _mainloop__WEBPACK_IMPORTED_MODULE_8__["setUpdate"](update);
     _mainloop__WEBPACK_IMPORTED_MODULE_8__["setDraw"](draw);
@@ -33018,7 +33019,7 @@ function addBody(x, y, w, h, options) {
     options.friction = 0;
     options.restitution = 1;
     options.inertia = Infinity
-    var body = Bodies.rectangle(x + w / 2, y + h / 2, w, h, options);
+    var body = Bodies.rectangle(x, y, w, h, options);
     if (options.isStatic) {
         staticBodies.push(body);
     }
@@ -33098,7 +33099,7 @@ var robotEntity;
 
 function create() {
     robotEntity = _game_engine__WEBPACK_IMPORTED_MODULE_7__["spawnEnitty"]('robot', {
-        x: 2000, y: 2000
+        x: 2900, y: 2050
     });
 }
 
@@ -33220,6 +33221,8 @@ class RobotEntity extends _entity__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.setVelocity(new victor__WEBPACK_IMPORTED_MODULE_4___default.a(0, 0));
     }
     update() {
+        this.pos.x = this.body.position.x;
+        this.pos.y = this.body.position.y;
         if (this.moving) {
             this.animations[this.currentAnimation].update();
         }
@@ -33303,13 +33306,36 @@ class SpriteAnimation {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Teleporter; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return TeleporterEntity; });
 /* harmony import */ var _entity__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity */ "./src/entity.js");
+/* harmony import */ var _sprite_animation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./sprite-animation */ "./src/sprite-animation.js");
 
 
-class Teleporter extends _entity__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    constructor() {
-        super();
+
+class TeleporterEntity extends _entity__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor(o) {
+        _.defaults(o, {
+            x: 0, y: 0,
+            w: 96, h: 96,
+        });
+        super(o);
+        this.animations = {
+            'idle': new _sprite_animation__WEBPACK_IMPORTED_MODULE_1__["default"]({
+                fromTemplate: true,
+                prefix: 'teleporter_idle_',
+                count: 16,
+                suffix: '.png',
+            }),
+        }
+        this.currentAnimation = 'idle';
+    }
+    update() {
+        this.animations[this.currentAnimation].update();
+    }
+    draw() {
+        this.animations[this.currentAnimation].draw(
+            this.pos.x, this.pos.y
+        );
     }
 }
 
@@ -33403,6 +33429,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _view_rect__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./view-rect */ "./src/view-rect.js");
 /* harmony import */ var _physics_engine__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./physics-engine */ "./src/physics-engine.js");
 /* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./images */ "./src/images.js");
+/* harmony import */ var _game_engine__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./game-engine */ "./src/game-engine.js");
+
 
 
 
@@ -33507,7 +33535,9 @@ class TiledMap {
             if (layer.type === 'objectgroup' && layer.name === 'collision') {
                 for (var obj of layer.objects) {
                     _physics_engine__WEBPACK_IMPORTED_MODULE_3__["addBody"](
-                        obj.x, obj.y, obj.width, obj.height,
+                        obj.x + obj.width / 2,
+                        obj.y + obj.height / 2,
+                        obj.width, obj.height,
                         {
                             isStatic: true
                         }
@@ -33521,6 +33551,22 @@ class TiledMap {
             if (layer.type === 'objectgroup' && layer.name === 'collision') {
                 for (var obj of layer.objects) {
                     _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].fillRect(obj.x, obj.y, obj.width, obj.height);
+                }
+            }
+        }
+    }
+    spawnTeleporters() {
+        for (var layer of this.mapJSON.layers) {
+            if (layer.type === 'objectgroup' && layer.name === 'environment') {
+                for (var obj of layer.objects) {
+                    if (obj.name === 'TP') {
+                        _game_engine__WEBPACK_IMPORTED_MODULE_5__["spawnEnitty"]('teleporter', {
+                            x: obj.x + obj.width / 2,
+                            y: obj.y + obj.height / 2,
+                            w: obj.width,
+                            h: obj.height
+                        });
+                    }
                 }
             }
         }

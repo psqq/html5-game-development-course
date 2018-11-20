@@ -19,7 +19,7 @@ export function addBody(x, y, w, h, options) {
     options.friction = 0;
     options.restitution = 1;
     options.inertia = Infinity
-    var body = Bodies.rectangle(x + w / 2, y + h / 2, w, h, options);
+    var body = Bodies.rectangle(x, y, w, h, options);
     if (options.isStatic) {
         staticBodies.push(body);
     }

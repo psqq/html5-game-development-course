@@ -51,6 +51,7 @@ async function main() {
 
     player.create();
     map.createStaticObjects();
+    map.spawnTeleporters();
 
     mainloop.setUpdate(update);
     mainloop.setDraw(draw);

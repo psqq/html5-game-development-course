@@ -82,6 +82,8 @@ export default class RobotEntity extends Entity {
         this.setVelocity(new Victor(0, 0));
     }
     update() {
+        this.pos.x = this.body.position.x;
+        this.pos.y = this.body.position.y;
         if (this.moving) {
             this.animations[this.currentAnimation].update();
         }
