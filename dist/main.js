@@ -32559,15 +32559,18 @@ function makeAlwaysCanvasFullscreen() {
 /*!*********************************!*\
   !*** ./src/entities-factory.js ***!
   \*********************************/
-/*! exports provided: robot, teleporter */
+/*! exports provided: robot, teleporter, rocketLauncherProjectile */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "robot", function() { return robot; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "teleporter", function() { return teleporter; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rocketLauncherProjectile", function() { return rocketLauncherProjectile; });
 /* harmony import */ var _robot_entity__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./robot-entity */ "./src/robot-entity.js");
 /* harmony import */ var _teleporter_entity__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./teleporter-entity */ "./src/teleporter-entity.js");
+/* harmony import */ var _rocket_launcher_projectile_entity__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./rocket-launcher-projectile-entity */ "./src/rocket-launcher-projectile-entity.js");
+
 
 
 
@@ -32577,6 +32580,10 @@ function robot(o) {
 
 function teleporter(o) {
     return new _teleporter_entity__WEBPACK_IMPORTED_MODULE_1__["default"](o);
+}
+
+function rocketLauncherProjectile(o) {
+    return new _rocket_launcher_projectile_entity__WEBPACK_IMPORTED_MODULE_2__["default"](o);
 }
 
 
@@ -32892,6 +32899,8 @@ function draw() {
     _view_rect__WEBPACK_IMPORTED_MODULE_3__["begin"]();
     map.drawFromCache();
     _game_engine__WEBPACK_IMPORTED_MODULE_6__["draw"]();
+    // physicsEngine.drawStaticBodyes();
+    // physicsEngine.drawDynamicBodyes();
     _view_rect__WEBPACK_IMPORTED_MODULE_3__["end"]();
 }
 
@@ -32913,9 +32922,11 @@ async function main() {
 
     _physics_engine__WEBPACK_IMPORTED_MODULE_5__["create"]();
 
-    _player__WEBPACK_IMPORTED_MODULE_4__["create"]();
     map.createStaticObjects();
     map.spawnTeleporters();
+
+    _player__WEBPACK_IMPORTED_MODULE_4__["create"]();
+    _player__WEBPACK_IMPORTED_MODULE_4__["bindEvents"]();
 
     _mainloop__WEBPACK_IMPORTED_MODULE_8__["setUpdate"](update);
     _mainloop__WEBPACK_IMPORTED_MODULE_8__["setDraw"](draw);
@@ -32976,7 +32987,7 @@ function run() {
 /*!*******************************!*\
   !*** ./src/physics-engine.js ***!
   \*******************************/
-/*! exports provided: Engine, Render, World, Body, Vector, Composite, Bodies, addBody, removeBody, create, update, drawBody, drawStaticBodyes */
+/*! exports provided: Engine, Render, World, Body, Vector, Composite, Bodies, addBody, removeBody, create, update, drawBody, drawDynamicBodyes, drawStaticBodyes */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -32993,6 +33004,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "create", function() { return create; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "update", function() { return update; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "drawBody", function() { return drawBody; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "drawDynamicBodyes", function() { return drawDynamicBodyes; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "drawStaticBodyes", function() { return drawStaticBodyes; });
 /* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! matter-js */ "./node_modules/matter-js/build/matter.js");
 /* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(matter_js__WEBPACK_IMPORTED_MODULE_0__);
@@ -33011,7 +33023,6 @@ var Engine = matter_js__WEBPACK_IMPORTED_MODULE_0___default.a.Engine,
     Bodies = matter_js__WEBPACK_IMPORTED_MODULE_0___default.a.Bodies;
 
 var engine, world;
-var staticBodies = [];
 
 function addBody(x, y, w, h, options) {
     options = options || {};
@@ -33020,9 +33031,6 @@ function addBody(x, y, w, h, options) {
     options.restitution = 1;
     options.inertia = Infinity
     var body = Bodies.rectangle(x, y, w, h, options);
-    if (options.isStatic) {
-        staticBodies.push(body);
-    }
     World.add(world, body);
     return body;
 }
@@ -33055,9 +33063,19 @@ function drawBody(body, color = 'black') {
     _canvas__WEBPACK_IMPORTED_MODULE_1__["context"].stroke();
 }
 
+function drawDynamicBodyes() {
+    var bodies = Composite.allBodies(world);
+    for (var b of bodies) {
+        drawBody(b, 'green');
+    }
+}
+
 function drawStaticBodyes() {
-    for (var b of staticBodies) {
-        drawBody(b, 'red');
+    var bodies = Composite.allBodies(world);
+    for (var b of bodies) {
+        if (b.isStatic) {
+            drawBody(b, 'red');
+        }
     }
 }
 
@@ -33114,7 +33132,15 @@ function update() {
 }
 
 function bindEvents() {
-    window.addEventListener('mousemove', (e) => { });
+    window.addEventListener('mousedown', (e) => {
+        var mousePos = new victor__WEBPACK_IMPORTED_MODULE_0___default.a(_view_rect__WEBPACK_IMPORTED_MODULE_2__["x"] + e.clientX, _view_rect__WEBPACK_IMPORTED_MODULE_2__["y"] + e.clientY);
+        var dir = mousePos.subtract(robotEntity.pos).norm();
+        var spawnPos = robotEntity.pos.clone().add(dir.clone().multiplyScalar(robotEntity.size.x));
+        _game_engine__WEBPACK_IMPORTED_MODULE_7__["spawnEnitty"]('rocketLauncherProjectile', {
+            x: spawnPos.x, y: spawnPos.y,
+            direction: dir,
+        });
+    });
 }
 
 
@@ -33229,8 +33255,73 @@ class RobotEntity extends _entity__WEBPACK_IMPORTED_MODULE_0__["default"] {
     }
     draw() {
         this.animations[this.currentAnimation].draw(
-            this.body.position.x, this.body.position.y
+            this.pos.x, this.pos.y
         );
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/rocket-launcher-projectile-entity.js":
+/*!**************************************************!*\
+  !*** ./src/rocket-launcher-projectile-entity.js ***!
+  \**************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return RocketLauncherProjectileEntity; });
+/* harmony import */ var _entity__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity */ "./src/entity.js");
+/* harmony import */ var _sprite_animation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./sprite-animation */ "./src/sprite-animation.js");
+/* harmony import */ var _physics_engine__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./physics-engine */ "./src/physics-engine.js");
+/* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! victor */ "./node_modules/victor/index.js");
+/* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(victor__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
+
+
+
+
+
+
+
+class RocketLauncherProjectileEntity extends _entity__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor(o) {
+        _.defaults(o, {
+            x: 0, y: 0,
+            w: 112, h: 76,
+            direction: new victor__WEBPACK_IMPORTED_MODULE_3___default.a(1, 0)
+        });
+        o.w = o.h = 10;
+        super(o);
+        this.body = _physics_engine__WEBPACK_IMPORTED_MODULE_2__["addBody"](o.x, o.y, o.w, o.h);
+        this.speed = 8;
+        this.velocity = o.direction.clone().multiplyScalar(this.speed);
+        this.setVelocity(this.velocity);
+        this.animations = {
+            'projectile': new _sprite_animation__WEBPACK_IMPORTED_MODULE_1__["default"]({
+                fromTemplate: true,
+                prefix: 'rocket_launcher_projectile_',
+                count: 8,
+                suffix: '.png',
+            }),
+        }
+        this.currentAnimation = 'projectile';
+    }
+    update() {
+        this.pos.x = this.body.position.x;
+        this.pos.y = this.body.position.y;
+        this.animations[this.currentAnimation].update();
+    }
+    draw() {
+        _canvas__WEBPACK_IMPORTED_MODULE_4__["context"].save();
+        _canvas__WEBPACK_IMPORTED_MODULE_4__["context"].translate(this.pos.x, this.pos.y);
+        _canvas__WEBPACK_IMPORTED_MODULE_4__["context"].rotate(this.velocity.angle() + Math.PI);
+        this.animations[this.currentAnimation].draw(
+            0, 0
+        );
+        _canvas__WEBPACK_IMPORTED_MODULE_4__["context"].restore();
     }
 }
 

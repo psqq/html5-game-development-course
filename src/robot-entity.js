@@ -90,7 +90,7 @@ export default class RobotEntity extends Entity {
     }
     draw() {
         this.animations[this.currentAnimation].draw(
-            this.body.position.x, this.body.position.y
+            this.pos.x, this.pos.y
         );
     }
 }

@@ -26,5 +26,13 @@ export function update() {
 }
 
 export function bindEvents() {
-    window.addEventListener('mousemove', (e) => { });
+    window.addEventListener('mousedown', (e) => {
+        var mousePos = new Victor(viewRect.x + e.clientX, viewRect.y + e.clientY);
+        var dir = mousePos.subtract(robotEntity.pos).norm();
+        var spawnPos = robotEntity.pos.clone().add(dir.clone().multiplyScalar(robotEntity.size.x));
+        gameEngine.spawnEnitty('rocketLauncherProjectile', {
+            x: spawnPos.x, y: spawnPos.y,
+            direction: dir,
+        });
+    });
 }

@@ -11,7 +11,6 @@ export var Engine = Matter.Engine,
     Bodies = Matter.Bodies;
 
 var engine, world;
-var staticBodies = [];
 
 export function addBody(x, y, w, h, options) {
     options = options || {};
@@ -20,9 +19,6 @@ export function addBody(x, y, w, h, options) {
     options.restitution = 1;
     options.inertia = Infinity
     var body = Bodies.rectangle(x, y, w, h, options);
-    if (options.isStatic) {
-        staticBodies.push(body);
-    }
     World.add(world, body);
     return body;
 }
@@ -55,8 +51,18 @@ export function drawBody(body, color = 'black') {
     ctx.stroke();
 }
 
+export function drawDynamicBodyes() {
+    var bodies = Composite.allBodies(world);
+    for (var b of bodies) {
+        drawBody(b, 'green');
+    }
+}
+
 export function drawStaticBodyes() {
-    for (var b of staticBodies) {
-        drawBody(b, 'red');
+    var bodies = Composite.allBodies(world);
+    for (var b of bodies) {
+        if (b.isStatic) {
+            drawBody(b, 'red');
+        }
     }
 }

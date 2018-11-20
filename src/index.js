@@ -28,6 +28,8 @@ function draw() {
     viewRect.begin();
     map.drawFromCache();
     gameEngine.draw();
+    // physicsEngine.drawStaticBodyes();
+    // physicsEngine.drawDynamicBodyes();
     viewRect.end();
 }
 
@@ -49,9 +51,11 @@ async function main() {
 
     physicsEngine.create();
 
-    player.create();
     map.createStaticObjects();
     map.spawnTeleporters();
+
+    player.create();
+    player.bindEvents();
 
     mainloop.setUpdate(update);
     mainloop.setDraw(draw);
