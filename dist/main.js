@@ -33179,30 +33179,35 @@ class RobotEntity extends _entity__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.body = _physics_engine__WEBPACK_IMPORTED_MODULE_2__["addBody"](o.x, o.y, o.w, o.h);
         this.speed = 5;
         this.moving = true;
+        this.animDuration = 300;
         this.animations = {
             'walk_down': new _sprite_animation__WEBPACK_IMPORTED_MODULE_3__["default"]({
                 fromTemplate: true,
                 prefix: 'walk_down_',
                 count: 30,
                 suffix: '.png',
+                duration: this.animDuration,
             }),
             'walk_up': new _sprite_animation__WEBPACK_IMPORTED_MODULE_3__["default"]({
                 fromTemplate: true,
                 prefix: 'walk_up_',
                 count: 30,
                 suffix: '.png',
+                duration: this.animDuration,
             }),
             'walk_left': new _sprite_animation__WEBPACK_IMPORTED_MODULE_3__["default"]({
                 fromTemplate: true,
                 prefix: 'walk_left_',
                 count: 30,
                 suffix: '.png',
+                duration: this.animDuration,
             }),
             'walk_right': new _sprite_animation__WEBPACK_IMPORTED_MODULE_3__["default"]({
                 fromTemplate: true,
                 prefix: 'walk_right_',
                 count: 30,
                 suffix: '.png',
+                duration: this.animDuration,
             }),
         };
         this.currentAnimation = 'walk_down';
@@ -33347,9 +33352,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class SpriteAnimation {
-    constructor(options) {
-        if (options.fromTemplate) {
-            var o = options;
+    constructor(o) {
+        if (o.fromTemplate) {
             o.spriteNames = [];
             for (var i = 0; i < o.count; i++) {
                 var num = pad__WEBPACK_IMPORTED_MODULE_2___default()(4, "" + i, '0');
@@ -33358,14 +33362,17 @@ class SpriteAnimation {
                 );
             }
         }
-        this.spriteNames = options.spriteNames || [];
+        this.spriteNames = o.spriteNames || [];
         this.findedSprites = [];
         for (var spriteName of this.spriteNames) {
             this.findedSprites.push(_images__WEBPACK_IMPORTED_MODULE_0__["findSprite"](spriteName));
         }
-        this.frameRate = options.frameRate || 1000 / 30;
-        this.offsetX = options.offsetX || 0;
-        this.offsetY = options.offsetY || 0;
+        if (o.duration) {
+            o.frameRate = o.duration / this.findedSprites.length;
+        }
+        this.frameRate = o.frameRate || 1000 / 30;
+        this.offsetX = o.offsetX || 0;
+        this.offsetY = o.offsetY || 0;
         this.frameTime = 0;
         this.frame = 0;
     }

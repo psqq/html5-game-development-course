@@ -14,30 +14,35 @@ export default class RobotEntity extends Entity {
         this.body = physicsEngine.addBody(o.x, o.y, o.w, o.h);
         this.speed = 5;
         this.moving = true;
+        this.animDuration = 300;
         this.animations = {
             'walk_down': new SpriteAnimation({
                 fromTemplate: true,
                 prefix: 'walk_down_',
                 count: 30,
                 suffix: '.png',
+                duration: this.animDuration,
             }),
             'walk_up': new SpriteAnimation({
                 fromTemplate: true,
                 prefix: 'walk_up_',
                 count: 30,
                 suffix: '.png',
+                duration: this.animDuration,
             }),
             'walk_left': new SpriteAnimation({
                 fromTemplate: true,
                 prefix: 'walk_left_',
                 count: 30,
                 suffix: '.png',
+                duration: this.animDuration,
             }),
             'walk_right': new SpriteAnimation({
                 fromTemplate: true,
                 prefix: 'walk_right_',
                 count: 30,
                 suffix: '.png',
+                duration: this.animDuration,
             }),
         };
         this.currentAnimation = 'walk_down';

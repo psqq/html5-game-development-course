@@ -3,9 +3,8 @@ import { dt } from './mainloop';
 import pad from 'pad';
 
 export default class SpriteAnimation {
-    constructor(options) {
-        if (options.fromTemplate) {
-            var o = options;
+    constructor(o) {
+        if (o.fromTemplate) {
             o.spriteNames = [];
             for (var i = 0; i < o.count; i++) {
                 var num = pad(4, "" + i, '0');
@@ -14,14 +13,17 @@ export default class SpriteAnimation {
                 );
             }
         }
-        this.spriteNames = options.spriteNames || [];
+        this.spriteNames = o.spriteNames || [];
         this.findedSprites = [];
         for (var spriteName of this.spriteNames) {
             this.findedSprites.push(images.findSprite(spriteName));
         }
-        this.frameRate = options.frameRate || 1000 / 30;
-        this.offsetX = options.offsetX || 0;
-        this.offsetY = options.offsetY || 0;
+        if (o.duration) {
+            o.frameRate = o.duration / this.findedSprites.length;
+        }
+        this.frameRate = o.frameRate || 1000 / 30;
+        this.offsetX = o.offsetX || 0;
+        this.offsetY = o.offsetY || 0;
         this.frameTime = 0;
         this.frame = 0;
     }
