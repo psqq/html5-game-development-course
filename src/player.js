@@ -9,7 +9,7 @@ import * as gameEngine from './game-engine';
 import RobotEntity from './robot-entity';
 import RocketLauncherProjectileEntity from './rocket-launcher-projectile-entity';
 
-var robotEntity;
+export var robotEntity;
 
 export function create() {
     robotEntity = gameEngine.spawnEnitty(

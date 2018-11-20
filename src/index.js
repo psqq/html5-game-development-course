@@ -11,8 +11,10 @@ import * as physicsEngine from './physics-engine';
 import * as gameEngine from './game-engine';
 import SpriteAnimation from './sprite-animation';
 import * as mainloop from './mainloop';
+import Minimap from './minimap';
 
 var map = new TiledMap('./assets/json/map.json');
+var minimap = new Minimap({ map });
 
 var teleporterIdleAnimation;
 
@@ -28,6 +30,7 @@ function draw() {
     viewRect.begin();
     map.drawFromCache();
     gameEngine.draw();
+    minimap.draw();
     // physicsEngine.drawStaticBodyes();
     // physicsEngine.drawDynamicBodyes();
     viewRect.end();

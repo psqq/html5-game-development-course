@@ -8,8 +8,7 @@ import { context as ctx } from './canvas';
 export default class RocketLauncherImpactEntity extends Entity {
     constructor(o) {
         _.defaults(o, {
-            x: 0, y: 0,
-            direction: new Victor(1, 0)
+            x: 0, y: 0
         });
         super(o);
         this.animations = {

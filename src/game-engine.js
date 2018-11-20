@@ -1,7 +1,7 @@
 import * as viewRect from './view-rect';
 import * as physicsEngine from './physics-engine';
 
-var entities = [];
+export var entities = [];
 var _deferredKill = [];
 
 export function create() {

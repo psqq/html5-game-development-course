@@ -32603,11 +32603,12 @@ class Entity {
 /*!****************************!*\
   !*** ./src/game-engine.js ***!
   \****************************/
-/*! exports provided: create, spawnEnitty, update, draw */
+/*! exports provided: entities, create, spawnEnitty, update, draw */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "entities", function() { return entities; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "create", function() { return create; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "spawnEnitty", function() { return spawnEnitty; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "update", function() { return update; });
@@ -32861,6 +32862,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _game_engine__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./game-engine */ "./src/game-engine.js");
 /* harmony import */ var _sprite_animation__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./sprite-animation */ "./src/sprite-animation.js");
 /* harmony import */ var _mainloop__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./mainloop */ "./src/mainloop.js");
+/* harmony import */ var _minimap__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./minimap */ "./src/minimap.js");
+
 
 
 
@@ -32872,6 +32875,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var map = new _tiled_map__WEBPACK_IMPORTED_MODULE_2__["default"]('./assets/json/map.json');
+var minimap = new _minimap__WEBPACK_IMPORTED_MODULE_9__["default"]({ map });
 
 var teleporterIdleAnimation;
 
@@ -32887,6 +32891,7 @@ function draw() {
     _view_rect__WEBPACK_IMPORTED_MODULE_3__["begin"]();
     map.drawFromCache();
     _game_engine__WEBPACK_IMPORTED_MODULE_6__["draw"]();
+    minimap.draw();
     // physicsEngine.drawStaticBodyes();
     // physicsEngine.drawDynamicBodyes();
     _view_rect__WEBPACK_IMPORTED_MODULE_3__["end"]();
@@ -32967,6 +32972,85 @@ function run() {
     }
     timeOfLastUpdate = performance.now();
     requestAnimationFrame(go);
+}
+
+
+/***/ }),
+
+/***/ "./src/minimap.js":
+/*!************************!*\
+  !*** ./src/minimap.js ***!
+  \************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Minimap; });
+/* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
+/* harmony import */ var _view_rect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./view-rect */ "./src/view-rect.js");
+/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./player */ "./src/player.js");
+/* harmony import */ var _rocket_launcher_projectile_entity__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./rocket-launcher-projectile-entity */ "./src/rocket-launcher-projectile-entity.js");
+/* harmony import */ var _game_engine__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./game-engine */ "./src/game-engine.js");
+
+
+
+
+
+
+class Minimap {
+    constructor(o) {
+        this.map = o.map;
+        this.pos = { x: 0, y: 0 };
+        this.size = { x: 200, y: 200 };
+    }
+    transformCoordsToMinimap(vec) {
+        var w = this.map.pixelSize.x, h = this.map.pixelSize.y;
+        var nw = this.size.x, nh = this.size.y;
+        var x = vec.x, y = vec.y;
+        var nx = nw * (x / w);
+        var ny = nh * (y / h);
+        return {
+            x: _view_rect__WEBPACK_IMPORTED_MODULE_1__["x"] + this.pos.x + nx,
+            y: _view_rect__WEBPACK_IMPORTED_MODULE_1__["y"] + this.pos.y + ny
+        };
+    }
+    drawMinimap() {
+        var c = this.map.cachedCanvas;
+        var w = this.map.pixelSize.x, h = this.map.pixelSize.y;
+        var nw = this.size.x, nh = this.size.y;
+        _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].drawImage(
+            c,
+            0, 0, w, h,
+            _view_rect__WEBPACK_IMPORTED_MODULE_1__["x"] + this.pos.x, _view_rect__WEBPACK_IMPORTED_MODULE_1__["y"] + this.pos.y,
+            nw, nh
+        );
+    }
+    drawPlayer() {
+        var npPos = this.transformCoordsToMinimap(_player__WEBPACK_IMPORTED_MODULE_2__["robotEntity"].pos);
+        var sz = 4;
+        _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].save();
+        _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].fillStyle = 'red';
+        _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].fillRect(npPos.x - sz / 2, npPos.y - sz / 2, sz, sz);
+        _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].restore();
+    }
+    drawRocketLauncherProjectiles() {
+        var sz = 2;
+        _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].save();
+        _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].fillStyle = 'red';
+        for(var ent of _game_engine__WEBPACK_IMPORTED_MODULE_4__["entities"]) {
+            if (ent instanceof _rocket_launcher_projectile_entity__WEBPACK_IMPORTED_MODULE_3__["default"]) {
+                var np = this.transformCoordsToMinimap(ent.pos);
+                _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].fillRect(np.x - sz / 2, np.y - sz / 2, sz, sz);
+            }
+        }
+        _canvas__WEBPACK_IMPORTED_MODULE_0__["context"].restore();
+    }
+    draw() {
+        this.drawMinimap();
+        this.drawPlayer();
+        this.drawRocketLauncherProjectiles();
+    }
 }
 
 
@@ -33079,11 +33163,12 @@ function drawStaticBodyes() {
 /*!***********************!*\
   !*** ./src/player.js ***!
   \***********************/
-/*! exports provided: create, update, bindEvents */
+/*! exports provided: robotEntity, create, update, bindEvents */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "robotEntity", function() { return robotEntity; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "create", function() { return create; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "update", function() { return update; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "bindEvents", function() { return bindEvents; });
@@ -33296,8 +33381,7 @@ __webpack_require__.r(__webpack_exports__);
 class RocketLauncherImpactEntity extends _entity__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor(o) {
         _.defaults(o, {
-            x: 0, y: 0,
-            direction: new victor__WEBPACK_IMPORTED_MODULE_3___default.a(1, 0)
+            x: 0, y: 0
         });
         super(o);
         this.animations = {
