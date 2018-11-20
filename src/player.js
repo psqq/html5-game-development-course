@@ -16,19 +16,12 @@ export function create() {
 }
 
 export function update() {
-    if (key.isPressed('a')) {
-        robotEntity.moveLeft();
-    } else if (key.isPressed('d')) {
-        robotEntity.moveRight();
-    } else if (key.isPressed('w')) {
-        robotEntity.moveUp();
-    }
-    else if (key.isPressed('s')) {
-        robotEntity.moveDown();
-    }
-    else {
-        robotEntity.stopMoving();
-    }
+    var dx = 0, dy = 0;
+    if (key.isPressed('a')) dx -= 1;
+    if (key.isPressed('d')) dx += 1;
+    if (key.isPressed('w')) dy -= 1;
+    if (key.isPressed('s')) dy += 1;
+    robotEntity.move(dx, dy);
     viewRect.centerAt(robotEntity.body.position.x, robotEntity.body.position.y);
 }
 

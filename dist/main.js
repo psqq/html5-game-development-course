@@ -33103,19 +33103,12 @@ function create() {
 }
 
 function update() {
-    if (keymaster__WEBPACK_IMPORTED_MODULE_3___default.a.isPressed('a')) {
-        robotEntity.moveLeft();
-    } else if (keymaster__WEBPACK_IMPORTED_MODULE_3___default.a.isPressed('d')) {
-        robotEntity.moveRight();
-    } else if (keymaster__WEBPACK_IMPORTED_MODULE_3___default.a.isPressed('w')) {
-        robotEntity.moveUp();
-    }
-    else if (keymaster__WEBPACK_IMPORTED_MODULE_3___default.a.isPressed('s')) {
-        robotEntity.moveDown();
-    }
-    else {
-        robotEntity.stopMoving();
-    }
+    var dx = 0, dy = 0;
+    if (keymaster__WEBPACK_IMPORTED_MODULE_3___default.a.isPressed('a')) dx -= 1;
+    if (keymaster__WEBPACK_IMPORTED_MODULE_3___default.a.isPressed('d')) dx += 1;
+    if (keymaster__WEBPACK_IMPORTED_MODULE_3___default.a.isPressed('w')) dy -= 1;
+    if (keymaster__WEBPACK_IMPORTED_MODULE_3___default.a.isPressed('s')) dy += 1;
+    robotEntity.move(dx, dy);
     _view_rect__WEBPACK_IMPORTED_MODULE_2__["centerAt"](robotEntity.body.position.x, robotEntity.body.position.y);
 }
 
@@ -33157,7 +33150,7 @@ class RobotEntity extends _entity__WEBPACK_IMPORTED_MODULE_0__["default"] {
         });
         super(o);
         this.body = _physics_engine__WEBPACK_IMPORTED_MODULE_2__["addBody"](o.x, o.y, o.w, o.h);
-        this.speed = 3;
+        this.speed = 5;
         this.moving = true;
         this.animations = {
             'walk_down': new _sprite_animation__WEBPACK_IMPORTED_MODULE_3__["default"]({
@@ -33206,6 +33199,21 @@ class RobotEntity extends _entity__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.moving = true;
         this.setVelocity(new victor__WEBPACK_IMPORTED_MODULE_4___default.a(0, this.speed));
         this.currentAnimation = 'walk_down';
+    }
+    move(dx, dy) {
+        if (dx == 0 && dy == 0) {
+            this.stopMoving();
+            return;
+        }
+        if (dx < 0 && dy == 0) this.moveLeft();
+        else if (dx > 0 && dy == 0) this.moveRight();
+        else if (dy < 0 && dx == 0) this.moveUp();
+        else if (dy > 0 && dx == 0) this.moveDown();
+        else {
+            this.moving = true;
+            var vel = new victor__WEBPACK_IMPORTED_MODULE_4___default.a(dx, dy);
+            this.setVelocity(vel.norm().multiplyScalar(this.speed));
+        }
     }
     stopMoving() {
         this.moving = false;

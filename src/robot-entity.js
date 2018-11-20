@@ -12,7 +12,7 @@ export default class RobotEntity extends Entity {
         });
         super(o);
         this.body = physicsEngine.addBody(o.x, o.y, o.w, o.h);
-        this.speed = 3;
+        this.speed = 5;
         this.moving = true;
         this.animations = {
             'walk_down': new SpriteAnimation({
@@ -61,6 +61,21 @@ export default class RobotEntity extends Entity {
         this.moving = true;
         this.setVelocity(new Victor(0, this.speed));
         this.currentAnimation = 'walk_down';
+    }
+    move(dx, dy) {
+        if (dx == 0 && dy == 0) {
+            this.stopMoving();
+            return;
+        }
+        if (dx < 0 && dy == 0) this.moveLeft();
+        else if (dx > 0 && dy == 0) this.moveRight();
+        else if (dy < 0 && dx == 0) this.moveUp();
+        else if (dy > 0 && dx == 0) this.moveDown();
+        else {
+            this.moving = true;
+            var vel = new Victor(dx, dy);
+            this.setVelocity(vel.norm().multiplyScalar(this.speed));
+        }
     }
     stopMoving() {
         this.moving = false;
