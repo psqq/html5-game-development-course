@@ -1,24 +1,43 @@
 import * as viewRect from './view-rect';
-import * as factory from './entities-factory';
+import * as physicsEngine from './physics-engine';
 
 var entities = [];
 var _deferredKill = [];
 
-export function spawnEnitty(typename, options) {
-    var ent = new (factory[typename])(options);
+export function create() {
+    physicsEngine.Events.on(
+        physicsEngine.engine,
+        "collisionStart",
+        (event) => {
+            for(var pair of event.pairs) {
+                var a = pair.bodyA, b = pair.bodyB;
+                if (a.userData && a.userData.entity) {
+                    a.userData.entity.onTouch(b);
+                }
+                if (b.userData && b.userData.entity) {
+                    b.userData.entity.onTouch(a);
+                }
+            }
+        }
+    );
+}
+
+export function spawnEnitty(ent) {
     entities.push(ent);
     return ent;
 }
 
 export function update() {
-    for(var ent of entities) {
+    for (var ent of entities) {
         if (!ent._killed) {
             ent.update();
         } else {
             _deferredKill.push(ent);
         }
     }
-    entities = entities.filter(e => !(_deferredKill.indexOf(e) >= 0));
+    if (_deferredKill.length > 0) {
+        entities = entities.filter(e => !(_deferredKill.indexOf(e) >= 0));
+    }
     _deferredKill = [];
 }
 
@@ -26,7 +45,7 @@ export function draw() {
     var fudgeVariance = 300;
     var zIndexArray = [];
     var entitiesBucketByZIndex = {};
-    for(var ent of entities) {
+    for (var ent of entities) {
         if (
             ent.pos.x < viewRect.x - fudgeVariance
             || ent.pos.x > viewRect.x + viewRect.w + fudgeVariance
@@ -42,8 +61,8 @@ export function draw() {
         entitiesBucketByZIndex[ent.zindex].push(ent);
     }
     zIndexArray.sort((a, b) => a - b);
-    for(var zIndex of zIndexArray) {
-        for(var ent of entitiesBucketByZIndex[zIndex]) {
+    for (var zIndex of zIndexArray) {
+        for (var ent of entitiesBucketByZIndex[zIndex]) {
             ent.draw();
         }
     }

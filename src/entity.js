@@ -11,8 +11,9 @@ export default class Entity {
         this.body = null;
     }
     kill() {
+        if (this._killed) return;
         this._killed = true;
-        physicsEngine.removeBody(this.body);
+        if (this.body) physicsEngine.removeBody(this.body);
     }
     setVelocity(vel) {
         physicsEngine.Body.setVelocity(
@@ -20,6 +21,7 @@ export default class Entity {
             new physicsEngine.Vector.create(vel.x, vel.y)
         );
     }
+    onTouch(body) {}
     update() {}
     draw() {}
 }

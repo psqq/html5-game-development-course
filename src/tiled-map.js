@@ -4,6 +4,7 @@ import * as viewRect from './view-rect';
 import * as physicsEngine from './physics-engine';
 import * as images from './images';
 import * as gameEngine from './game-engine';
+import TeleporterEntity from './teleporter-entity';
 
 export default class TiledMap {
     constructor(filename) {
@@ -128,12 +129,14 @@ export default class TiledMap {
             if (layer.type === 'objectgroup' && layer.name === 'environment') {
                 for (var obj of layer.objects) {
                     if (obj.name === 'TP') {
-                        gameEngine.spawnEnitty('teleporter', {
-                            x: obj.x + obj.width / 2,
-                            y: obj.y + obj.height / 2,
-                            w: obj.width,
-                            h: obj.height
-                        });
+                        gameEngine.spawnEnitty(
+                            new TeleporterEntity({
+                                x: obj.x + obj.width / 2,
+                                y: obj.y + obj.height / 2,
+                                w: obj.width,
+                                h: obj.height
+                            })
+                        );
                     }
                 }
             }

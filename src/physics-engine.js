@@ -8,9 +8,10 @@ export var Engine = Matter.Engine,
     Body = Matter.Body,
     Vector = Matter.Vector,
     Composite = Matter.Composite,
+    Events = Matter.Events,
     Bodies = Matter.Bodies;
 
-var engine, world;
+export var engine, world;
 
 export function addBody(x, y, w, h, options) {
     options = options || {};

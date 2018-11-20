@@ -12,6 +12,7 @@ export default class RobotEntity extends Entity {
         });
         super(o);
         this.body = physicsEngine.addBody(o.x, o.y, o.w, o.h);
+        this.body.userData = { entity: this };
         this.speed = 5;
         this.moving = true;
         this.animDuration = 300;

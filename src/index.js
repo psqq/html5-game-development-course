@@ -50,6 +50,7 @@ async function main() {
     viewRect.updateSize();
 
     physicsEngine.create();
+    gameEngine.create();
 
     map.createStaticObjects();
     map.spawnTeleporters();
