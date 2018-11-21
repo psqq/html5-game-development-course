@@ -22,7 +22,7 @@ export default class RocketLauncherImpactEntity extends Entity {
             }),
         }
         this.currentAnimation = 'impact';
-        soundManager.play('sfx_wpn_cannon2');
+        soundManager.playWorldSound('sfx_wpn_cannon2', this.pos.x, this.pos.y);
     }
     update() {
         if (this.animations[this.currentAnimation].done) {

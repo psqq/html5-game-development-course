@@ -37212,7 +37212,7 @@ class RocketLauncherImpactEntity extends _entity__WEBPACK_IMPORTED_MODULE_0__["d
             }),
         }
         this.currentAnimation = 'impact';
-        _sound_manager__WEBPACK_IMPORTED_MODULE_5__["play"]('sfx_wpn_cannon2');
+        _sound_manager__WEBPACK_IMPORTED_MODULE_5__["playWorldSound"]('sfx_wpn_cannon2', this.pos.x, this.pos.y);
     }
     update() {
         if (this.animations[this.currentAnimation].done) {
@@ -37311,12 +37311,13 @@ class RocketLauncherProjectileEntity extends _entity__WEBPACK_IMPORTED_MODULE_0_
 /*!******************************!*\
   !*** ./src/sound-manager.js ***!
   \******************************/
-/*! exports provided: play, toggleMuteAll, create */
+/*! exports provided: play, playWorldSound, toggleMuteAll, create */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "play", function() { return play; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "playWorldSound", function() { return playWorldSound; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toggleMuteAll", function() { return toggleMuteAll; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "create", function() { return create; });
 /* harmony import */ var howler__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! howler */ "./node_modules/howler/dist/howler.js");
@@ -37325,6 +37326,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var path_browserify__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(path_browserify__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var keymaster__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! keymaster */ "./node_modules/keymaster/keymaster.js");
 /* harmony import */ var keymaster__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(keymaster__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./player */ "./src/player.js");
+/* harmony import */ var _view_rect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./view-rect */ "./src/view-rect.js");
+/* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! victor */ "./node_modules/victor/index.js");
+/* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(victor__WEBPACK_IMPORTED_MODULE_5__);
+
+
+
 
 
 
@@ -37342,8 +37350,25 @@ addSound('./assets/sounds/battleThemeA.mp3', true, 0.5);
 addSound('./assets/sounds/sfx_wpn_laser6.wav');
 addSound('./assets/sounds/sfx_wpn_cannon2.wav');
 
-function play(name) {
-    sounds[name].play();
+function play(name, o) {
+    var id = sounds[name].play();
+    o = o || {};
+    if (o.volume) {
+        sounds[name].volume(o.volume, id);
+    }
+    return id;
+}
+
+function playWorldSound(name, x, y) {
+    var px = _player__WEBPACK_IMPORTED_MODULE_3__["robotEntity"].pos.x;
+    var py = _player__WEBPACK_IMPORTED_MODULE_3__["robotEntity"].pos.y;
+    var r = Math.max(_view_rect__WEBPACK_IMPORTED_MODULE_4__["w"], _view_rect__WEBPACK_IMPORTED_MODULE_4__["h"]);
+    var sv = new victor__WEBPACK_IMPORTED_MODULE_5___default.a(x, y), pv = new victor__WEBPACK_IMPORTED_MODULE_5___default.a(px, py);
+    var d = sv.subtract(pv).length();
+    var normD = d / r;
+    if (normD > 1) normD = 1;
+    var volume = 1 - normD;
+    if (volume > 0) play(name, { volume });
 }
 
 function toggleMuteAll() {
