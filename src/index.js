@@ -13,6 +13,7 @@ import * as mainloop from './mainloop';
 import Minimap from './minimap';
 import * as soundManager from './sound-manager';
 import { el, mount, unmount } from 'redom';
+import * as debug from './debug';
 
 var map = new TiledMap('./assets/json/map.json');
 var minimap = new Minimap({ map });
@@ -85,7 +86,7 @@ async function main() {
     player.bindEvents();
 
     minimap.makeCache();
-    
+
     finishLoading();
 
     mainloop.setUpdate(update);
@@ -93,5 +94,6 @@ async function main() {
     mainloop.run();
 }
 
+debug.init();
 startLoading();
 main();

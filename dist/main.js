@@ -36304,6 +36304,89 @@ function makeAlwaysCanvasFullscreen() {
 
 /***/ }),
 
+/***/ "./src/debug.js":
+/*!**********************!*\
+  !*** ./src/debug.js ***!
+  \**********************/
+/*! exports provided: init */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "init", function() { return init; });
+/* harmony import */ var _entity__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity */ "./src/entity.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _physics_engine__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./physics-engine */ "./src/physics-engine.js");
+/* harmony import */ var _sprite_animation__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./sprite-animation */ "./src/sprite-animation.js");
+/* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! victor */ "./node_modules/victor/index.js");
+/* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(victor__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _game_engine__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./game-engine */ "./src/game-engine.js");
+/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./player */ "./src/player.js");
+/* harmony import */ var _images__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./images */ "./src/images.js");
+
+
+
+
+
+
+
+
+
+var px, py;
+
+class DebugEntity extends _entity__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor(o) {
+        o = o || {};
+        updatePlayerCoords();
+        lodash__WEBPACK_IMPORTED_MODULE_1___default.a.defaults(o, {
+            x: px, y: py, zindex: 100
+        });
+        super(o);
+        this.px = this.pos.x;
+        this.py = this.pos.y;
+        this.o = o;
+    }
+}
+
+class SpriteEntity extends DebugEntity {
+    constructor(o) {
+        super(o);
+    }
+    draw() {
+        _images__WEBPACK_IMPORTED_MODULE_7__["findAndDrawSprite"](this.o.spriteName, this.px, this.py);
+    }
+}
+
+function updatePlayerCoords() {
+    px = _player__WEBPACK_IMPORTED_MODULE_6__["robotEntity"].pos.x;
+    py = _player__WEBPACK_IMPORTED_MODULE_6__["robotEntity"].pos.y;
+}
+
+function addSprite(name) {
+    _game_engine__WEBPACK_IMPORTED_MODULE_5__["spawnEnitty"](new SpriteEntity({
+        spriteName: name,
+    }));
+}
+
+function printPlayerCoord() {
+    console.log(_player__WEBPACK_IMPORTED_MODULE_6__["robotEntity"].pos);
+}
+
+var addToWindow = { addSprite, printPlayerCoord };
+
+function init() {
+    window.d = {
+        ge: _game_engine__WEBPACK_IMPORTED_MODULE_5__
+    };
+    for (var k in addToWindow) {
+        window.d[k] = addToWindow[k];
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/entity.js":
 /*!***********************!*\
   !*** ./src/entity.js ***!
@@ -36317,16 +36400,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! victor */ "./node_modules/victor/index.js");
 /* harmony import */ var victor__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(victor__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _physics_engine__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./physics-engine */ "./src/physics-engine.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_2__);
+
 
 
 
 class Entity {
     constructor(o) {
         o = o || {};
-        this.pos = new victor__WEBPACK_IMPORTED_MODULE_0___default.a(o.x || 0, o.y || 0);
-        this.size = new victor__WEBPACK_IMPORTED_MODULE_0___default.a(o.w || 0, o.h || 0);
+        lodash__WEBPACK_IMPORTED_MODULE_2___default.a.defaults(o, { zindex: 0, x: 0, y: 0, w: 0, h: 0 });
+        this.pos = new victor__WEBPACK_IMPORTED_MODULE_0___default.a(o.x, o.y);
+        this.size = new victor__WEBPACK_IMPORTED_MODULE_0___default.a(o.w, o.h);
         this._killed = false;
-        this.zindex = 0;
+        this.zindex = o.zindex;
         this.body = null;
     }
     kill() {
@@ -36340,9 +36427,9 @@ class Entity {
             new _physics_engine__WEBPACK_IMPORTED_MODULE_1__["Vector"].create(vel.x, vel.y)
         );
     }
-    onTouch(body) {}
-    update() {}
-    draw() {}
+    onTouch(body) { }
+    update() { }
+    draw() { }
 }
 
 
@@ -36375,12 +36462,18 @@ function create() {
         _physics_engine__WEBPACK_IMPORTED_MODULE_1__["engine"],
         "collisionStart",
         (event) => {
-            for(var pair of event.pairs) {
+            for (var pair of event.pairs) {
                 var a = pair.bodyA, b = pair.bodyB;
-                if (a.userData && a.userData.entity) {
+                if (a.userData
+                    && a.userData.entity
+                    && a.userData.entity.onTouch
+                ) {
                     a.userData.entity.onTouch(b);
                 }
-                if (b.userData && b.userData.entity) {
+                if (b.userData
+                    && b.userData.entity
+                    && b.userData.entity.onTouch
+                ) {
                     b.userData.entity.onTouch(a);
                 }
             }
@@ -36396,7 +36489,7 @@ function spawnEnitty(ent) {
 function update() {
     for (var ent of entities) {
         if (!ent._killed) {
-            ent.update();
+            if (ent.update) ent.update();
         } else {
             _deferredKill.push(ent);
         }
@@ -36429,7 +36522,7 @@ function draw() {
     zIndexArray.sort((a, b) => a - b);
     for (var zIndex of zIndexArray) {
         for (var ent of entitiesBucketByZIndex[zIndex]) {
-            ent.draw();
+            if (ent.draw) ent.draw();
         }
     }
 }
@@ -36613,6 +36706,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _minimap__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./minimap */ "./src/minimap.js");
 /* harmony import */ var _sound_manager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./sound-manager */ "./src/sound-manager.js");
 /* harmony import */ var redom__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! redom */ "./node_modules/redom/dist/redom.es.js");
+/* harmony import */ var _debug__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./debug */ "./src/debug.js");
+
 
 
 
@@ -36696,7 +36791,7 @@ async function main() {
     _player__WEBPACK_IMPORTED_MODULE_4__["bindEvents"]();
 
     minimap.makeCache();
-    
+
     finishLoading();
 
     _mainloop__WEBPACK_IMPORTED_MODULE_7__["setUpdate"](update);
@@ -36704,6 +36799,7 @@ async function main() {
     _mainloop__WEBPACK_IMPORTED_MODULE_7__["run"]();
 }
 
+_debug__WEBPACK_IMPORTED_MODULE_11__["init"]();
 startLoading();
 main();
 

@@ -9,12 +9,18 @@ export function create() {
         physicsEngine.engine,
         "collisionStart",
         (event) => {
-            for(var pair of event.pairs) {
+            for (var pair of event.pairs) {
                 var a = pair.bodyA, b = pair.bodyB;
-                if (a.userData && a.userData.entity) {
+                if (a.userData
+                    && a.userData.entity
+                    && a.userData.entity.onTouch
+                ) {
                     a.userData.entity.onTouch(b);
                 }
-                if (b.userData && b.userData.entity) {
+                if (b.userData
+                    && b.userData.entity
+                    && b.userData.entity.onTouch
+                ) {
                     b.userData.entity.onTouch(a);
                 }
             }
@@ -30,7 +36,7 @@ export function spawnEnitty(ent) {
 export function update() {
     for (var ent of entities) {
         if (!ent._killed) {
-            ent.update();
+            if (ent.update) ent.update();
         } else {
             _deferredKill.push(ent);
         }
@@ -63,7 +69,7 @@ export function draw() {
     zIndexArray.sort((a, b) => a - b);
     for (var zIndex of zIndexArray) {
         for (var ent of entitiesBucketByZIndex[zIndex]) {
-            ent.draw();
+            if (ent.draw) ent.draw();
         }
     }
 }
