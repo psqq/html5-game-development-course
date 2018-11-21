@@ -12,6 +12,7 @@ import * as gameEngine from './game-engine';
 import * as mainloop from './mainloop';
 import Minimap from './minimap';
 import * as soundManager from './sound-manager';
+import { el, mount, unmount } from 'redom';
 
 var map = new TiledMap('./assets/json/map.json');
 var minimap = new Minimap({ map });
@@ -32,6 +33,35 @@ function draw() {
     // physicsEngine.drawStaticBodyes();
     // physicsEngine.drawDynamicBodyes();
     viewRect.end();
+}
+
+var dots = [];
+var loadingEl = el(
+    'span',
+    {
+        style: {
+            position: 'fixed',
+            left: '10px',
+            right: '10px',
+            'font-size': '20pt',
+        }
+    },
+    'Loading...',
+);
+var loadingAnimId;
+
+function startLoading() {
+    mount(document.body, loadingEl);
+    // loadingAnimId = setInterval(() => {
+    //     dots.push('.');
+    //     if (dots.length > 3) dots = [];
+    //     loadingEl.textContent = 'Loading' + dots.join('');
+    // }, 500);
+}
+
+function finishLoading() {
+    unmount(document.body, loadingEl);
+    // clearInterval(loadingAnimId);
 }
 
 async function main() {
@@ -55,10 +85,13 @@ async function main() {
     player.bindEvents();
 
     minimap.makeCache();
+    
+    finishLoading();
 
     mainloop.setUpdate(update);
     mainloop.setDraw(draw);
     mainloop.run();
 }
 
+startLoading();
 main();
