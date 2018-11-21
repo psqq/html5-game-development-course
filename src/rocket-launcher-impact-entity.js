@@ -3,6 +3,7 @@ import SpriteAnimation from './sprite-animation';
 import * as physicsEngine from './physics-engine';
 import Victor from 'victor';
 import { context as ctx } from './canvas';
+import * as soundManager from './sound-manager';
 
 
 export default class RocketLauncherImpactEntity extends Entity {
@@ -21,6 +22,7 @@ export default class RocketLauncherImpactEntity extends Entity {
             }),
         }
         this.currentAnimation = 'impact';
+        soundManager.play('sfx_wpn_cannon2');
     }
     update() {
         if (this.animations[this.currentAnimation].done) {

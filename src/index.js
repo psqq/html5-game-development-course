@@ -9,14 +9,12 @@ import * as viewRect from './view-rect';
 import * as player from './player';
 import * as physicsEngine from './physics-engine';
 import * as gameEngine from './game-engine';
-import SpriteAnimation from './sprite-animation';
 import * as mainloop from './mainloop';
 import Minimap from './minimap';
+import * as soundManager from './sound-manager';
 
 var map = new TiledMap('./assets/json/map.json');
 var minimap = new Minimap({ map });
-
-var teleporterIdleAnimation;
 
 function update() {
     player.update();
@@ -30,7 +28,7 @@ function draw() {
     viewRect.begin();
     map.drawFromCache();
     gameEngine.draw();
-    minimap.draw();
+    minimap.drawFromCache();
     // physicsEngine.drawStaticBodyes();
     // physicsEngine.drawDynamicBodyes();
     viewRect.end();
@@ -40,12 +38,7 @@ async function main() {
     makeAlwaysCanvasFullscreen();
     await images.loadAll();
 
-    console.log('teleporter_idle_0015.png', images.findSprite('teleporter_idle_0015.png'));
-
-    teleporterIdleAnimation = new SpriteAnimation({
-        spriteNames: Array(16).fill("teleporter_idle_")
-            .map((x, i) => x + ("" + i).padStart(4, '0') + '.png'),
-    });
+    soundManager.create();
 
     await map.loadAndParse();
     map.makeCache();
@@ -60,6 +53,8 @@ async function main() {
 
     player.create();
     player.bindEvents();
+
+    minimap.makeCache();
 
     mainloop.setUpdate(update);
     mainloop.setDraw(draw);

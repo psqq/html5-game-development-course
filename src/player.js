@@ -8,6 +8,7 @@ import { dt } from './mainloop';
 import * as gameEngine from './game-engine';
 import RobotEntity from './robot-entity';
 import RocketLauncherProjectileEntity from './rocket-launcher-projectile-entity';
+import * as soundManager from './sound-manager';
 
 export var robotEntity;
 
@@ -40,5 +41,6 @@ export function bindEvents() {
                 direction: dir,
             })
         );
+        soundManager.play('sfx_wpn_laser6');
     });
 }

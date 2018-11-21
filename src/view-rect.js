@@ -5,6 +5,10 @@ import {
 
 export var x = 0, y = 0, w = 0, h = 0, scale = 1;
 
+export function getxywh() {
+    return { x, y, w, h };
+}
+
 export function getRect() {
     return {
         left: x, right: x + w,

@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "del": "^3.0.0",
+    "howler": "^2.0.15",
     "keymaster": "^1.6.2",
     "lodash": "^4.17.11",
     "matter-js": "^0.14.2",
